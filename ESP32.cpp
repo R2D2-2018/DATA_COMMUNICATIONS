@@ -3,26 +3,23 @@
 ESP32::ESP32(){
 }
 
-ESP32::reset(){	
+void ESP32::reset(){	
 }
 
-ESP32::set_bank(){
+int ESP32::read_register(){	
 }
 
-ESP32::read_register(){	
+void ESP32::write_register(){
 }
 
-ESP32::write_register(){
+void ESP32::set_bit(){
 }
 
-ESP32::set_bit(){
+void ESP32::erase_bit(){
 }
 
-ESP32::erase_bit(){
+int ESP32::read_buffer(){	
 }
 
-ESP32::read_buffer(){	
-}
-
-ESP32::write_buffer(){
+void ESP32::write_buffer(){
 }

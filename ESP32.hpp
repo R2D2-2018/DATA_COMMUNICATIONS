@@ -8,18 +8,16 @@ private:
 public:
 	ESP32();
 
-	reset();
-
-	set_bank();
+	void reset();
 	
-	read_register();
-	write_register();
+	int read_register();
+	void write_register();
 	
-	set_bit();
-	erase_bit();
+	void set_bit();
+	void erase_bit();
 	
-	read_buffer();
-	write_buffer();
+	int read_buffer();
+	void write_buffer();
 	
 };
 
