@@ -4,20 +4,19 @@
 class ESP32 {
 private:
 	
-	
 public:
 	ESP32();
 
 	void reset();
 	
 	int read_register();
-	void write_register();
+	void write_register(int address, int data);
 	
 	void set_bit();
 	void erase_bit();
 	
 	int read_buffer();
-	void write_buffer();
+	void write_buffer(int data);
 	
 };
 
