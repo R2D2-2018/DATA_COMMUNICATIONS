@@ -3,3 +3,4 @@
 #include "../src/ESP32.hpp"
 
 #include "test_ESP32.cpp"
+#include "test_Dummy_OP_CODES.cpp"
