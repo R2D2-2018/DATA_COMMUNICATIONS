@@ -25,7 +25,8 @@ include_directories (${catch}/single_include)
 # Source Files:
 
 set (sources
-    src/wrap-hwlib.cpp
+  #  src/wrap-hwlib.cpp
     src/libc-stub.cpp
-    src/main.cpp
+  #  src/main.cpp
+    src/ESP32.cpp
 )

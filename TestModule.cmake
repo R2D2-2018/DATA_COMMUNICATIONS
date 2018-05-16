@@ -1,5 +1,11 @@
 include (CTest)
 
+#JULIAN'S MAGIC // TEST
+set (sources
+     ${sources}
+     test/test_main.cpp
+)
+
 set (build_test build_test)
 set (unit_test unit_test)
 set (memcheck memcheck)
@@ -20,7 +26,7 @@ add_test (
 endif (build_test_enabled)
 
 if (unit_test_enabled)
-add_executable (${unit_test} ${unit_test_main})
+add_executable (${unit_test} ${unit_test_main} ${sources})
 
 add_test (
 	NAME ${unit_test}

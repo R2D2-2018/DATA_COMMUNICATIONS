@@ -1,5 +1,12 @@
 include (../../flags.cmake)
 
+#JULIAN'S MAGIC // BUILD
+set (sources
+     ${sources}
+     src/main.cpp
+	 src/wrap-hwlib.hpp
+	)
+
 set (cxxflags
     "-Os"
     "-ffunction-sections"

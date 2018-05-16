@@ -8,8 +8,6 @@
 #ifndef ESP32_HPP
 #define ESP32_HPP
 
-#include "catch.hpp"
-
 class ESP32 {
 private:
 	
