@@ -1,15 +1,12 @@
 #include "catch.hpp"
 #include "../src/ESP32.hpp"
 
+#include <typeinfo>
+
 ESP32 esp32;
 
-TEST_CASE( "Return input" ) {
-    REQUIRE(esp32.readRegister(0) == 0);
-    REQUIRE(esp32.readRegister(1) == 1);
-    REQUIRE(esp32.readRegister(5) == 5);
-    REQUIRE(esp32.readRegister(-1) == -1);
+TEST_CASE( "ESP32 instance is of type ESP32" ){
+	REQUIRE(typeid(esp32).name() == typeid(ESP32).name());
 }
 
-TEST_CASE( "Return 0" ) {
-    REQUIRE(esp32.readBuffer() == 0);
-}
+
