@@ -3,7 +3,9 @@
 #include "freertos/task.h"
 #include "esp_system.h"
 #include "esp_spi_flash.h"
+
 #include "LED.hpp"
+#include "SPI.hpp"
 
 extern "C" {
    void app_main();
@@ -11,5 +13,6 @@ extern "C" {
 
 void app_main() {
     auto led = LED();
+    [[maybe_unused]] auto bus = SPI();
     led.blinkInfinitly(1000);
 }
