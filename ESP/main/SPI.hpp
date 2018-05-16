@@ -26,15 +26,19 @@ class SPI {
         spi_bus_config_t buscfg={
             .mosi_io_num=pins::GPIO_MOSI,
             .miso_io_num=pins::GPIO_MISO,
-            .sclk_io_num=pins::GPIO_SCLK
+            .sclk_io_num=pins::GPIO_SCLK,
+            .quadwp_io_num=-1,
+            .quadhd_io_num=-1,
+            .max_transfer_sz=0,
+            .flags=0,
         };
 
         //Configuration for the SPI slave interface
         spi_slave_interface_config_t slvcfg={
-            .mode=0,
-            .spics_io_num=GPIO_CS,
-            .queue_size=3,
+            .spics_io_num=pins::GPIO_CS,
             .flags=0,
+            .queue_size=3,
+            .mode=0,
             .post_setup_cb=nullptr,
             .post_trans_cb=nullptr,
         };
