@@ -1,7 +1,7 @@
 #include "catch.hpp"
 #include "../src/memory_map.hpp"
 
-TEST_CASE( "Correct MemoryBlock enum values" ){
+TEST_CASE( "Correct MemoryBlock enum values", "[Static_Values]" ){
 	REQUIRE(data_4MB_External_0_L == 0x3F400000);
 	REQUIRE(data_4MB_External_0_H == 0x3F7FFFFF);
 	
@@ -12,7 +12,7 @@ TEST_CASE( "Correct MemoryBlock enum values" ){
 	REQUIRE(data_instruction_8KB_Embedded_H == 0x50001FFF);
 }
 
-TEST_CASE( "Correct Register enum values" ){
+TEST_CASE( "Correct Register enum values", "[Static_values]" ){
 	REQUIRE(GPIO_OUT_REG == 0x3FF44004);
 	REQUIRE(GPIO_OUT_W1TS_REG == 0x3FF44008);
 	REQUIRE(GPIO_OUT_W1TC_REG == 0x3FF4400C);
