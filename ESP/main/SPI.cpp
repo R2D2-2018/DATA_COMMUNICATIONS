@@ -15,3 +15,33 @@ SPI::SPI() {
     ret=spi_slave_initialize(HSPI_HOST, &buscfg, &slvcfg, 1);
     assert(ret==ESP_OK);
 };
+
+bool SPI::SPIInit() {
+    try {
+        std::memset(recvBuffer, 0x00, sizeof recvBuffer);
+        std::memset(sendBuffer, 0x00, sizeof sendBuffer);
+
+        transaction.length=128;
+        transaction.tx_buffer=sendBuffer;
+        transaction.rx_buffer=recvBuffer;
+    } catch (...) {
+        return false;
+    }
+
+    printf("Initialized SPI Slave bus");
+    return true;
+};
+
+void SPI::waitForTransaction() {
+    ret = spi_slave_transmit(HSPI_HOST, &transaction, portMAX_DELAY);
+}
+
+void SPI::printRecv() {
+    //printf("Received: %x\n", recvBuffer[0]);
+    //printf("Received: %x\n", recvBuffer[1]);
+    for(int i = 0; i < sizeof(recvBuffer); ++i) {
+        printf("%x", recvBuffer[i]);
+    }
+    auto led = LED();
+    led.blinkInfinitly(500);
+}

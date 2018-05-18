@@ -11,6 +11,14 @@
 #include "esp_log.h"
 #include "esp_spi_flash.h"
 
+#include "LED.hpp"
+
+#include <cstring>
+
+#include <array>
+#include <functional>
+#include <utility>
+
 class SPI {
     private:
         enum pins : uint8_t {
@@ -43,10 +51,18 @@ class SPI {
             .post_trans_cb=nullptr,
         };
 
+        char recvBuffer[128] = "";
+        char sendBuffer[128] = "";
+
+        spi_slave_transaction_t transaction;
+        
     public:
         SPI();
 
-        
+        bool SPIInit();
+
+        void waitForTransaction();
+        void printRecv();
 };
 
 #endif // SPI_HPP

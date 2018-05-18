@@ -14,5 +14,13 @@ extern "C" {
 void app_main() {
     auto led = LED();
     [[maybe_unused]] auto bus = SPI();
-    led.blinkInfinitly(1000);
+
+    bus.SPIInit();
+    bus.waitForTransaction();
+    while (true) {
+        bus.printRecv();
+    }
+
+    printf("Received data");
+    //led.blinkInfinitly(1000);
 }

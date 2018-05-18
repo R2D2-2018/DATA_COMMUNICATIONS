@@ -4,7 +4,7 @@ include (../../flags.cmake)
 set (sources
      ${sources}
      src/main.cpp
-	 src/wrap-hwlib.hpp
+	 src/wrap-hwlib.cpp
 	)
 
 set (cxxflags
