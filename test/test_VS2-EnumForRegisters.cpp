@@ -1,7 +1,7 @@
 #include "catch.hpp"
 #include "../src/memory_map.hpp"
 
-TEST_CASE( "Correct MemoryBlock enum values", "[Static_Values]" ){
+TEST_CASE( "Correct MemoryBlock enum values", "[Static_values]" ){
 	REQUIRE(data_4MB_External_0_L == 0x3F400000);
 	REQUIRE(data_4MB_External_0_H == 0x3F7FFFFF);
 	
