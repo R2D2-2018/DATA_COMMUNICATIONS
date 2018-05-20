@@ -17,23 +17,40 @@ SPI::SPI() {
 };
 
 bool SPI::SPIInit() {
+    /*
     try {
-        std::memset(recvBuffer, 0x00, sizeof recvBuffer);
-        std::memset(sendBuffer, 0x00, sizeof sendBuffer);
+        std::memset(recvBuffer, 0x41, sizeof(recvBuffer));
+        std::memset(sendBuffer, 0x00, sizeof(sendBuffer));
 
-        transaction.length=128;
+        transaction.length=4;
         transaction.tx_buffer=sendBuffer;
         transaction.rx_buffer=recvBuffer;
     } catch (...) {
         return false;
     }
 
-    printf("Initialized SPI Slave bus");
+    printf("Initialized SPI Slave bus\n");
+    */
     return true;
 };
 
 void SPI::waitForTransaction() {
+    spi_slave_transaction_t transaction;
+    spi_slave_transaction_t* out;
+    std::memset(recvBuffer, 0x41, sizeof(recvBuffer));
+    std::memset(sendBuffer, 0x00, sizeof(sendBuffer));
+    std::memset(&transaction, 0, sizeof(transaction));
+    //SPIInit();
+
+    transaction.length=8*4;
+    transaction.tx_buffer=sendBuffer;
+    transaction.rx_buffer=recvBuffer;
+
     ret = spi_slave_transmit(HSPI_HOST, &transaction, portMAX_DELAY);
+    if(ret != ESP_OK) {
+        printf("Look here");
+    }
+    printf("Transaction received\n");
 }
 
 void SPI::printRecv() {
@@ -42,6 +59,11 @@ void SPI::printRecv() {
     for(int i = 0; i < sizeof(recvBuffer); ++i) {
         printf("%x", recvBuffer[i]);
     }
+    printf("\n");
+    for(int i = 0; i < sizeof(sendBuffer); ++i) {
+        printf("%x", sendBuffer[i]);
+    }
+    printf("\n");
     auto led = LED();
-    led.blinkInfinitly(500);
+    //led.blinkInfinitly(500);
 }

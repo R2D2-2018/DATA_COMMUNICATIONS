@@ -15,9 +15,17 @@ void app_main() {
     auto led = LED();
     [[maybe_unused]] auto bus = SPI();
 
-    bus.SPIInit();
-    bus.waitForTransaction();
+    //auto retValue = bus.SPIInit();
+    /*
+    if(!retValue) {
+        printf("Slave init failed");
+        led.blinkInfinitly(1000);
+    }
+    */
+
+
     while (true) {
+        bus.waitForTransaction();
         bus.printRecv();
     }
 

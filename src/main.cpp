@@ -8,7 +8,7 @@ int main() {
     hwlib::wait_ms(2500);
 
     auto bus = due::spi_bus_due();
-    uint8_t writeOp[4] = {0x00, 0x01, 0x02, 0x03};
+    uint8_t writeOp[4] = {0xA2, 0xA1, 0xA8, 0x03};
 
     while (true) {
         bus.write_and_read(hwlib::pin_out_dummy, 4, writeOp, nullptr);    

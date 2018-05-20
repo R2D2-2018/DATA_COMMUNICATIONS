@@ -17,6 +17,7 @@
 
 #include <array>
 #include <functional>
+#include <iostream>
 #include <utility>
 
 class SPI {
@@ -51,10 +52,8 @@ class SPI {
             .post_trans_cb=nullptr,
         };
 
-        char recvBuffer[128] = "";
-        char sendBuffer[128] = "";
-
-        spi_slave_transaction_t transaction;
+        char recvBuffer[16] = "";
+        char sendBuffer[16] = "";
         
     public:
         SPI();
