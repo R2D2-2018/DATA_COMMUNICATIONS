@@ -7,6 +7,10 @@
 #include "LED.hpp"
 #include "SPI.hpp"
 
+#include <cstring>
+
+#include <vector>
+
 extern "C" {
    void app_main();
 }
@@ -23,12 +27,21 @@ void app_main() {
     }
     */
 
+    std::vector<char> dest;
 
-    while (true) {
+    for (int i = 0; i < 4; ++i) {
         bus.waitForTransaction();
-        bus.printRecv();
+        bus.printRecv(dest);
     }
 
-    printf("Received data");
-    //led.blinkInfinitly(1000);
+    printf("Received data\n");
+    printf("Size: %d\n", dest.size());
+
+    for (auto item : dest) {
+        printf("%d", item);
+    }
+
+    if (dest[0] == 0xA2 && dest[7] == 0x1C) {
+        led.blinkInfinitly(500);
+    }
 }

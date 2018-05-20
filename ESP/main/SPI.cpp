@@ -40,20 +40,19 @@ void SPI::waitForTransaction() {
     std::memset(recvBuffer, 0x41, sizeof(recvBuffer));
     std::memset(sendBuffer, 0x00, sizeof(sendBuffer));
     std::memset(&transaction, 0, sizeof(transaction));
-    //SPIInit();
+    SPIInit();
 
-    transaction.length=8*4;
+    transaction.length=8*2;
     transaction.tx_buffer=sendBuffer;
     transaction.rx_buffer=recvBuffer;
 
     ret = spi_slave_transmit(HSPI_HOST, &transaction, portMAX_DELAY);
-    if(ret != ESP_OK) {
-        printf("Look here");
-    }
+    assert(ret == ESP_OK);
+
     printf("Transaction received\n");
 }
 
-void SPI::printRecv() {
+void SPI::printRecv(std::vector<char>& destBuffer) {
     //printf("Received: %x\n", recvBuffer[0]);
     //printf("Received: %x\n", recvBuffer[1]);
     for(int i = 0; i < sizeof(recvBuffer); ++i) {
@@ -64,6 +63,9 @@ void SPI::printRecv() {
         printf("%x", sendBuffer[i]);
     }
     printf("\n");
-    auto led = LED();
+    destBuffer.push_back(recvBuffer[0]);
+    destBuffer.push_back(recvBuffer[1]);
+
+    //auto led = LED();
     //led.blinkInfinitly(500);
 }

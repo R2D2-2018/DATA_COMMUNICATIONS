@@ -19,6 +19,7 @@
 #include <functional>
 #include <iostream>
 #include <utility>
+#include <vector>
 
 class SPI {
     private:
@@ -61,7 +62,7 @@ class SPI {
         bool SPIInit();
 
         void waitForTransaction();
-        void printRecv();
+        void printRecv(std::vector<char>& destBuffer);
 };
 
 #endif // SPI_HPP
