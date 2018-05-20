@@ -8,9 +8,12 @@
 #ifndef ESP32_HPP
 #define ESP32_HPP
 
+#include "command.hpp"
+
+#include <array>
+
 class ESP32 {
 private:
-	
 public:
 	ESP32();
 
@@ -39,7 +42,7 @@ public:
 	 * @param[in] address The address to write to
 	 * @param[in] data The data to be written to the specified register
 	 */
-	void writeRegister(int address, int data);
+	void writeRegister(int address, std::array<uint8_t, 2> data);
 	
 	/**
 	 * @brief Sets a bit in a register from the ESP32 chip

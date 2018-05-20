@@ -17,7 +17,10 @@ int ESP32::readRegister(int address){
 	return address;
 }
 
-void ESP32::writeRegister(int address, int data){
+void ESP32::writeRegister(uint8_t address, std::array<uint8_t, 2> data) {
+    auto comm = Command(1, address);
+    comm.setData(data);
+    comm.sendCommand();
 }
 
 void ESP32::setBit(){
