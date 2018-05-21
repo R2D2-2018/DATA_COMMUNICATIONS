@@ -24,15 +24,15 @@
 class SPI {
     private:
         enum pins : uint8_t {
-            GPIO_MOSI = 12,
-            GPIO_MISO = 13,
-            GPIO_SCLK = 15,
-            GPIO_CS = 14,
+            GPIO_MOSI = 12, ///< GPIO pin 12 Master-out-slave-in
+            GPIO_MISO = 13, ///< GPIO pin 13 Master-in-Slave-out
+            GPIO_SCLK = 15, ///< GPIO pin 15 Clock
+            GPIO_CS = 14,   ///< GPIO pin 14 Chip-select
         };
 
-        esp_err_t ret;
+        esp_err_t ret; ///< ESP error return structure
 
-        //Configuration for the SPI bus
+        ///< Configuration for the SPI bus
         spi_bus_config_t buscfg={
             .mosi_io_num=pins::GPIO_MOSI,
             .miso_io_num=pins::GPIO_MISO,
@@ -43,7 +43,7 @@ class SPI {
             .flags=0,
         };
 
-        //Configuration for the SPI slave interface
+        ///< Configuration for the SPI slave interface
         spi_slave_interface_config_t slvcfg={
             .spics_io_num=pins::GPIO_CS,
             .flags=0,
@@ -53,15 +53,40 @@ class SPI {
             .post_trans_cb=nullptr,
         };
 
-        char recvBuffer[16] = "";
-        char sendBuffer[16] = "";
+        char recvBuffer[16] = ""; ///< Receive buffer for the SPI slave
+        char sendBuffer[16] = ""; ///< Sending buffer for the SPI slave
         
     public:
+        /**
+         * @brief       Constructor for the SPI Slave
+         *
+         * Constructs the SPI slave object.
+         */
         SPI();
 
+        /**
+         * @brief       Initializes the SPI bus
+         * 
+         * Initialises the SPI bus as a slave.
+         *
+         * @returns     Bool which will be true upon good execution.
+         */
         bool SPIInit();
 
+        /**
+         * @brief       Puts ESP on hold until the a transaction has taken place.
+         *
+         * The ESP32 will be waiting for a SPI transaction to take place.
+         */
         void waitForTransaction();
+        /**
+         * @brief       Print the receive and send buffer.
+         *
+         * Function prints the received and send buffer to the console.
+         * Function also puts the first 2 bytes into the extraction buffer.
+         *
+         * @param[in]   destBuffer      Destination buffer for the first 2 bytes.
+         */
         void printRecv(std::vector<char>& destBuffer);
 };
 

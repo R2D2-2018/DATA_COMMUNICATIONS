@@ -4,6 +4,7 @@
 #include "esp_system.h"
 #include "esp_spi_flash.h"
 
+#include "command.hpp"
 #include "LED.hpp"
 #include "SPI.hpp"
 
@@ -29,13 +30,16 @@ void app_main() {
 
     std::vector<char> dest;
 
-    for (int i = 0; i < 4; ++i) {
+    for (int i = 0; i < 2; ++i) {
         bus.waitForTransaction();
         bus.printRecv(dest);
     }
 
     printf("Received data\n");
     printf("Size: %d\n", dest.size());
+
+    auto comm = Command(dest);
+    comm.process();
 
     for (auto item : dest) {
         printf("%d", item);
@@ -44,4 +48,6 @@ void app_main() {
     if (dest[0] == 0xA2 && dest[7] == 0x1C) {
         led.blinkInfinitly(500);
     }
+
+    return;
 }

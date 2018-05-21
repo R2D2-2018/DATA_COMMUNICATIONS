@@ -4,6 +4,7 @@ Command::Command(std::vector<char> raw):
     raw(raw)
 {
     parseRaw();
+    printf("Command excepted\n");
 };
 
 auto Command::getType(uint32_t command) noexcept {
@@ -22,13 +23,14 @@ void Command::parseRaw() noexcept {
     std::get<3>(temp) = raw[3];
     command = (std::get<0>(temp) << 24) | (std::get<1>(temp) << 16) |
               (std::get<2>(temp) << 8)  | (std::get<3>(temp));
+    printf("Full command: %x\n", command);
 }
 
 void Command::process() {
     switch (getType(command)) {
         case instructionType::Read: read(getLoc(command)); break;
         case instructionType::Write: write(getLoc(command), getValue(command)); break;
-        default: printf("invalid type"); break;
+        default: printf("invalid type\n"); break;
     }
 }
 
