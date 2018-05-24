@@ -8,44 +8,43 @@
  * @license     MIT
  */
 
+#include "esp_spi_flash.h"
+#include "esp_system.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
-#include "esp_system.h"
-#include "esp_spi_flash.h"
 
 class LED {
-    private:
-        uint32_t* GPIO_w1ts = (uint32_t*)0x3ff44008; ///< Output set register
-        uint32_t* GPIO_w1tc = (uint32_t*)0x3ff4400c; ///< Output clear register
+  private:
+    uint32_t *GPIO_w1ts = (uint32_t *)0x3ff44008; ///< Output set register
+    uint32_t *GPIO_w1tc = (uint32_t *)0x3ff4400c; ///< Output clear register
 
-    public:
-        /**
-         * @brief Contructor for the LED class
-         * 
-         * Contructor for the LED class.
-         */
-        LED();
+  public:
+    /**
+     * @brief Contructor for the LED class
+     *
+     * Contructor for the LED class.
+     */
+    LED();
 
-        /**
-         * @brief blinks the led infinitly
-         * 
-         * Blinks the LED infinitly.
-         * This will put the ESP into an infinite loop.
-         * 
-         * @param[in]     msDelay    Amount of ms delay between state change
-         */
-        void blinkInfinitly(int msDelay);
-        /**
-         * @brief blinks the led for a set amount of times
-         * 
-         * This function wil blink the LED a set amount of times.
-         * The delay is also controllable.
-         * 
-         * @param[in]   amount     The amount of times the LED will blink
-         * @param[in]   msDelay    Amount of ms delay between state change
-         */
-        void blinkAmount(int amount, int msDelay);
-
+    /**
+     * @brief blinks the led infinitly
+     *
+     * Blinks the LED infinitly.
+     * This will put the ESP into an infinite loop.
+     *
+     * @param[in]     msDelay    Amount of ms delay between state change
+     */
+    void blinkInfinetly(int msDelay);
+    /**
+     * @brief blinks the led for a set amount of times
+     *
+     * This function wil blink the LED a set amount of times.
+     * The delay is also controllable.
+     *
+     * @param[in]   amount     The amount of times the LED will blink
+     * @param[in]   msDelay    Amount of ms delay between state change
+     */
+    void blinkAmount(int amount, int msDelay);
 };
 
 #endif // LED_HPP

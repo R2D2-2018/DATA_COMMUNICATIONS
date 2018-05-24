@@ -1,18 +1,18 @@
 #include "LED.hpp"
 
-LED::LED(){
+LED::LED() {
     gpio_set_direction(GPIO_NUM_2, GPIO_MODE_OUTPUT);
 };
 
-void LED::blinkInfinitly(int msDelay) {
-    bool direction = true;
+void LED::blinkInfinetly(int msDelay) {
+    bool isOn = true;
     while (true) {
-        if (direction) {
+        if (isOn) {
             *GPIO_w1ts = 1 << 2;
         } else {
             *GPIO_w1tc = 1 << 2;
         }
-        direction = !direction;
+        isOn = !isOn;
         vTaskDelay(msDelay / portTICK_PERIOD_MS);
     }
 };

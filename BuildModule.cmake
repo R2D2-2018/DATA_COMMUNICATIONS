@@ -4,8 +4,8 @@ include (../../flags.cmake)
 set (sources
      ${sources}
      src/main.cpp
-	 src/wrap-hwlib.cpp
-	)
+     src/wrap-hwlib.cpp
+)
 
 set (cxxflags
     "-Os"
