@@ -7,6 +7,7 @@
 #include "command.hpp"
 #include "LED.hpp"
 #include "SPI.hpp"
+#include "I2C.hpp"
 
 #include <cstring>
 
@@ -18,15 +19,14 @@ extern "C" {
 
 void app_main() {
     auto led = LED();
+    /*
     [[maybe_unused]] auto bus = SPI();
 
     //auto retValue = bus.SPIInit();
-    /*
     if(!retValue) {
         printf("Slave init failed");
         led.blinkInfinitly(1000);
     }
-    */
 
     std::vector<char> dest;
 
@@ -47,6 +47,14 @@ void app_main() {
 
     if (dest[0] == 0xA2 && dest[7] == 0x1C) {
         led.blinkInfinitly(500);
+    }
+    */
+
+    auto bus = I2C();
+
+    while(true) {
+        auto size = bus.waitForWrite();
+        printf("Received size: %d", size);
     }
 
     return;
