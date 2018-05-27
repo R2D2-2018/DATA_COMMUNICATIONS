@@ -34,7 +34,7 @@ class LED {
      *
      * @param[in]     msDelay    Amount of ms delay between state change
      */
-    void blinkInfinetly(int msDelay);
+    void blinkInfinitely(int msDelay);
     /**
      * @brief blinks the led for a set amount of times
      *

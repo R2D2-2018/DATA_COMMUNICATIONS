@@ -4,7 +4,7 @@ LED::LED() {
     gpio_set_direction(GPIO_NUM_2, GPIO_MODE_OUTPUT);
 };
 
-void LED::blinkInfinetly(int msDelay) {
+void LED::blinkInfinitely(int msDelay) {
     bool isOn = true;
     while (true) {
         if (isOn) {

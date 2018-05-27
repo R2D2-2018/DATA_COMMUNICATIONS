@@ -11,5 +11,5 @@ extern "C" {
 
 void app_main() {
     auto led = LED();
-    led.blinkInfinitly(1000);
+    led.blinkInfinitely(1000);
 }
