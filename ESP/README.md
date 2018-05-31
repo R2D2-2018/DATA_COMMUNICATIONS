@@ -27,3 +27,5 @@
     * read the sensor data, if connected.
     * i2c master(ESP32) will write data to i2c slave(ESP32).
     * i2c master(ESP32) will read data from i2c slave(ESP32).
+
+-- Taken from the ESP32 IDF
