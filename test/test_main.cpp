@@ -2,7 +2,7 @@
 #include "catch.hpp"
 #include "../src/ESP32.hpp"
 
-ESP32 test_ESP32;
+/*ESP32 test_ESP32;
 
 TEST_CASE( "Example Test Case" ) {
     REQUIRE(10 == 10);
@@ -17,4 +17,4 @@ TEST_CASE( "Return input" ) {
 
 TEST_CASE( "Return 0" ) {
     REQUIRE(test_ESP32.readBuffer() == 0);
-}
+}*/
