@@ -9,3 +9,6 @@
 
 // VERTICAL_SLICE_2
 #include "test_VS2-EnumForRegisters.hpp"
+
+// VERTICAL_SLICE_3
+#include "test_VS3_I2C_Base.hpp"

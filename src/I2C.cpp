@@ -14,6 +14,6 @@ auto I2C::I2C::read(const uint8_t address) -> std::array<uint8_t, length> {
 }
 
 template <std::size_t length>
-auto I2C::I2C::write(const uint8_t address, std::array<uint8_t, length> buffer) -> void {
+auto I2C::I2C::write(const uint8_t address, std::array<uint8_t, length> &buffer) -> void {
     return;
 }

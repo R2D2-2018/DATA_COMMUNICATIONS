@@ -1,6 +1,9 @@
 #include "ESP32.hpp"
+#include "I2C.hpp"
 #include "memory_map.hpp"
 #include "wrap-hwlib.hpp"
+
+#include <array>
 
 int main() {
     WDT->WDT_MR = WDT_MR_WDDIS;
@@ -43,7 +46,12 @@ int main() {
     //esp.writeRegister(0x01, data);
     */
 
-    hwlib::cout << "hello world" << hwlib::endl;
+    // hwlib::cout << "hello world" << hwlib::endl;
+
+    auto bus = I2C::I2C();
+
+    std::array<uint8_t, 4> arr = {0};
+    // bus.write<4>(0x28, arr);
 
     return 0;
 }

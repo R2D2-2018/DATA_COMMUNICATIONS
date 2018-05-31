@@ -17,11 +17,10 @@ class I2C {
     template <std::size_t length>
     auto read(const uint8_t address) -> std::array<uint8_t, length>;
 
-    template <std::size_t length>
-    auto read(const uint8_t address) -> std::array<uint8_t, length> &;
-
+    /*
     template <std::size_t length>
     auto write(const uint8_t address, std::array<uint8_t, length> buffer) -> void;
+    */
 
     template <std::size_t length>
     auto write(const uint8_t address, std::array<uint8_t, length> &buffer) -> void;
