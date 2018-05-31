@@ -79,23 +79,6 @@ static void masterInit() {
                        masterTransmissionBufferLen, 0);
 }
 
-///< slave initialization
-static void slaveInit() {
-    i2c_port_t i2c_slave_port = slavePortNum;
-    i2c_config_t conf_slave;
-    conf_slave.sda_io_num = slaveSDA;
-    conf_slave.sda_pullup_en = GPIO_PULLUP_ENABLE;
-    conf_slave.scl_io_num = slaveSCL;
-    conf_slave.scl_pullup_en = GPIO_PULLUP_ENABLE;
-    conf_slave.mode = I2C_MODE_SLAVE;
-    conf_slave.slave.addr_10bit_en = 0;
-    conf_slave.slave.slave_addr = slaveAddress;
-    i2c_param_config(i2c_slave_port, &conf_slave);
-    i2c_driver_install(i2c_slave_port, conf_slave.mode,
-                       slaveReceivingBufferLen,
-                       slaveTransmissionBufferLen, 0);
-}
-
 ///< Print buffer contents
 static void printBuffer(uint8_t* buf, int len) {
 	std::cout << std::hex;
@@ -110,12 +93,7 @@ static void printBuffer(uint8_t* buf, int len) {
 	std::cout << std::dec;
 }
 
-///< Tasks which performs tests					Example:
-///< 1. Slave buffer is filled with data	--> [1,2,3]
-///< 2. Master reads data from slave		--> [1,2,3]
-///< 2. Master writes data to slave			--> [7,7,7]
-///< 3. Master reads data from slave		--> [7,7,7]
-static void twoModesOneESP(void * taskID) {
+static void master(void * taskID) {
 	int i = 0;
     int ret;
     uint32_t task_idx = (uint32_t) taskID;
@@ -125,71 +103,49 @@ static void twoModesOneESP(void * taskID) {
 	uint8_t * data_rd = new uint8_t[dataLength];
 	
     int count = 0;
-    while(1) {
+	while (1) {
 		std::cout << "==================\n";
 		std::cout << "test count: " << count++ << "\n";
 		std::cout << "==================\n";
-        xSemaphoreGive(print_mux);
-
+		
         for(i = 0; i < dataLength; i++) {
-            data[i] = i;
-        }
-        xSemaphoreTake(print_mux, portMAX_DELAY);
-        size_t d_size = i2c_slave_write_buffer(slavePortNum, data, rwTestLength, 1000 / portTICK_RATE_MS);
-        if(d_size == 0) {
-			std::cout << "slave transmission buffer is FULL!\n";
-            ret = masterReadSlave(masterPortNum, data_rd, dataLength);
-        } else {
-            ret = masterReadSlave(masterPortNum, data_rd, rwTestLength);
+            data_wr[i] = i;
         }
 
-        if(ret == ESP_ERR_TIMEOUT) {
-			std::cout << "I2C TIME_OUT\n";
-        } else if(ret == ESP_OK) {
-			std::cout << "TASK[" << task_idx << "] Slave buffer data:\n";
-            printBuffer(data, d_size);
-			std::cout << "TASK[" << task_idx << "] master read:\n";
-            printBuffer(data_rd, d_size);
-        } else {
-			std::cout << esp_err_to_name(ret) << ": Master read slave error, IO not connected...\n";
-        }
-        xSemaphoreGive(print_mux);
-        ///< ---------------------------------------------------
-        int size = 0;
-        for(i = 0; i < dataLength; i++) {
-            data_wr[i] = i + 10;
-        }
-        xSemaphoreTake(print_mux, portMAX_DELAY);
-        ///< The slave buffer needs to be filled so the master can read it later
         ret = masterWriteSlave( masterPortNum, data_wr, rwTestLength);
-        if(ret == ESP_OK) {
-            size = i2c_slave_read_buffer( slavePortNum, data, rwTestLength, 1000 / portTICK_RATE_MS);
-        }
+
         if(ret == ESP_ERR_TIMEOUT) {
 			std::cout << "I2C TIME_OUT\n";
         } else if(ret == ESP_OK) {
 			std::cout << "Task[" << task_idx << "] master write:\n";
             printBuffer(data_wr, rwTestLength);
-			std::cout << "Task[" << task_idx << "] slave read: [" << size << "] bytes:\n";
-            printBuffer(data, size);
         } else {
 			std::cout << "Task [" << task_idx << "] " << esp_err_to_name(ret) << ": Master write slave error, IO not connected...\n";
         }
-        xSemaphoreGive(print_mux);
+		//---------------------------------------------------
+		ret = masterReadSlave(masterPortNum, data_rd, rwTestLength);
+		
+       if(ret == ESP_ERR_TIMEOUT) {
+			std::cout << "I2C TIME_OUT\n";
+        } else if(ret == ESP_OK) {
+			std::cout << "TASK[" << task_idx << "] master read:\n";
+            printBuffer(data_rd, rwTestLength);
+        } else {
+			std::cout << esp_err_to_name(ret) << ": Master read slave error, IO not connected...\n";
+        }
         vTaskDelay(( delayTimeBetweenItemsMS * ( task_idx + 1 ) ) / portTICK_RATE_MS);
-    }
+	}
 	delete data;
 	delete data_wr;
 	delete data_rd;
 }
 
-extern "C" void app_main(){
-	
-    print_mux = xSemaphoreCreateMutex();
-    slaveInit();
-    masterInit();
 
-    xTaskCreate(twoModesOneESP, "i2c_test_task_1", 1024 * 2, (void* ) 1, 10, NULL);
+
+extern "C" void app_main() {
+
+	masterInit();
+	xTaskCreate(master, "master", 1024 * 2, (void* ) 1, 10, NULL);
 	
 }
 
