@@ -141,12 +141,10 @@ static void twoModesOneESP(void * taskID) {
 		std::cout << "==================\n";
 		std::cout << "test count: " << count++ << "\n";
 		std::cout << "==================\n";
-        xSemaphoreGive(print_mux);
 
         for(i = 0; i < dataLength; i++) {
             data[i] = i;
         }
-        xSemaphoreTake(print_mux, portMAX_DELAY);
         size_t d_size = slaveWriteBuffer(data);
         if(d_size == 0) {
 			std::cout << "slave transmission buffer is FULL!\n";
@@ -165,13 +163,11 @@ static void twoModesOneESP(void * taskID) {
         } else {
 			std::cout << esp_err_to_name(ret) << ": Master read slave error, IO not connected...\n";
         }
-        xSemaphoreGive(print_mux);
         ///< ---------------------------------------------------
         int size = 0;
         for(i = 0; i < dataLength; i++) {
             data_wr[i] = i + 10;
         }
-        xSemaphoreTake(print_mux, portMAX_DELAY);
         ///< The slave buffer needs to be filled so the master can read it later
         ret = masterWriteSlave( masterPortNum, data_wr, rwTestLength);
         if(ret == ESP_OK) {
@@ -187,7 +183,6 @@ static void twoModesOneESP(void * taskID) {
         } else {
 			std::cout << "Task [" << task_idx << "] " << esp_err_to_name(ret) << ": Master write slave error, IO not connected...\n";
         }
-        xSemaphoreGive(print_mux);
         vTaskDelay(( delayTimeBetweenItemsMS * ( task_idx + 1 ) ) / portTICK_RATE_MS);
     }
 	delete data;
@@ -197,7 +192,6 @@ static void twoModesOneESP(void * taskID) {
 
 extern "C" void app_main(){
 	
-    print_mux = xSemaphoreCreateMutex();
     slaveInit();
     masterInit();
 
