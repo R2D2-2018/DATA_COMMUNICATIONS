@@ -8,8 +8,6 @@
 #ifndef ESP32_HPP
 #define ESP32_HPP
 
-#include "command.hpp"
-
 #include <array>
 
 class ESP32 {

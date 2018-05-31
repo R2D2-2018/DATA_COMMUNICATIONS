@@ -29,5 +29,4 @@ set (sources
     src/libc-stub.cpp
   #  src/main.cpp
     src/ESP32.cpp
-    src/command.cpp
 )
