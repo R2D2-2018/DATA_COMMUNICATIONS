@@ -1,34 +1,34 @@
-#include <stdio.h>
+#include <iostream>
 #include "driver/i2c.h"
 
-#define DATA_LENGTH                        512              /*!<Data buffer length for test buffer*/
-#define RW_TEST_LENGTH                     129              /*!<Data length for r/w test, any value from 0-DATA_LENGTH*/
-#define DELAY_TIME_BETWEEN_ITEMS_MS        1234             /*!< delay time between different test items */
+constexpr int dataLength = 512; 							///< Data buffer length for test_buffer
+constexpr int rwTestLength = 64; 							///< Data length for r/w test, any value from 0 - dataLength
+constexpr int delayTimeBetweenItemsMS = 1234;				///< Delay time between different test items
 
-#define I2C_EXAMPLE_SLAVE_SCL_IO           GPIO_NUM_26               /*!<gpio number for i2c slave clock  */
-#define I2C_EXAMPLE_SLAVE_SDA_IO           GPIO_NUM_25               /*!<gpio number for i2c slave data */
-#define I2C_EXAMPLE_SLAVE_NUM              i2c_port_t::I2C_NUM_0        /*!<I2C port number for slave dev */
-#define I2C_EXAMPLE_SLAVE_TX_BUF_LEN       (2*DATA_LENGTH)  /*!<I2C slave tx buffer size */
-#define I2C_EXAMPLE_SLAVE_RX_BUF_LEN       (2*DATA_LENGTH)  /*!<I2C slave rx buffer size */
+///< SLAVE_CONFIGURATION
+constexpr gpio_num_t slaveSCL = gpio_num_t::GPIO_NUM_26;	///< GPIO number for slave CLK
+constexpr gpio_num_t slaveSDA = gpio_num_t::GPIO_NUM_25;	///< GPIO number for slave DATA
+constexpr i2c_port_t slavePortNum = i2c_port_t::I2C_NUM_0;	///< Slave port number
+constexpr int slaveTransmissionBufferLen = 2*dataLength;	///< Slave transmission buffer size
+constexpr int slaveReceivingBufferLen = 2*dataLength;		///< Slave receiving buffer size
 
-#define I2C_EXAMPLE_MASTER_SCL_IO          GPIO_NUM_19               /*!< gpio number for I2C master clock */
-#define I2C_EXAMPLE_MASTER_SDA_IO          GPIO_NUM_18               /*!< gpio number for I2C master data  */
-#define I2C_EXAMPLE_MASTER_NUM             i2c_port_t::I2C_NUM_1        /*!< I2C port number for master dev */
-#define I2C_EXAMPLE_MASTER_TX_BUF_DISABLE  0                /*!< I2C master do not need buffer */
-#define I2C_EXAMPLE_MASTER_RX_BUF_DISABLE  0                /*!< I2C master do not need buffer */
-#define I2C_EXAMPLE_MASTER_FREQ_HZ         100000           /*!< I2C master clock frequency */
+//< MASTER CONFIGURATION
+constexpr gpio_num_t masterSCL = gpio_num_t::GPIO_NUM_19;	///< GPIO number for master CLK
+constexpr gpio_num_t masterSDA = gpio_num_t::GPIO_NUM_18;	///< GPIO number for master DATA
+constexpr i2c_port_t masterPortNum = i2c_port_t::I2C_NUM_1;	///< Master port number
+constexpr int masterTransmissionBufferLen = 0;				///< Master transmission buffer size
+constexpr int masterReceivingBufferLen = 0;					///< Master receiving buffer size
+constexpr int masterClockFrequency = 100000;				///< Master clock frequency
 
-#define ESP_SLAVE_ADDR                     0x28             /*!< ESP32 slave address, you can set any 7bit value */
-#define WRITE_BIT                          I2C_MASTER_WRITE /*!< I2C master write */
-#define READ_BIT                           I2C_MASTER_READ  /*!< I2C master read */
-#define ACK_CHECK_EN                       0x1              /*!< I2C master will check ack from slave*/
-#define ACK_CHECK_DIS                      0x0              /*!< I2C master will not check ack from slave */
+///<>////
 
-#define ACK_VAL                            i2c_ack_type_t::I2C_MASTER_ACK              /*!< I2C ack value */
-#define NACK_VAL                           i2c_ack_type_t::I2C_MASTER_NACK              /*!< I2C nack value */
+constexpr uint8_t slaveAddress = 0x28;						///< ESP32 slave address
+constexpr i2c_rw_t writeBit = i2c_rw_t::I2C_MASTER_WRITE;	///< Master WRITE bit
+constexpr i2c_rw_t readBit = i2c_rw_t::I2C_MASTER_READ;		///< Master READ bit
 
-
-#include <iostream>
+constexpr bool checkAck = true;											///< Whether master will check from ACKs from slave
+constexpr i2c_ack_type_t masterAck = i2c_ack_type_t::I2C_MASTER_ACK;	///< Master ACK value
+constexpr i2c_ack_type_t masterNack = i2c_ack_type_t::I2C_MASTER_NACK;	///< Master NACK value (false)
 
 SemaphoreHandle_t print_mux = NULL;
 
@@ -39,11 +39,11 @@ static esp_err_t i2c_example_master_read_slave(i2c_port_t i2c_num, uint8_t* data
     }
     i2c_cmd_handle_t cmd = i2c_cmd_link_create();
     i2c_master_start(cmd);
-    i2c_master_write_byte(cmd, ( ESP_SLAVE_ADDR << 1 ) | READ_BIT, ACK_CHECK_EN);
+    i2c_master_write_byte(cmd, ( slaveAddress << 1 ) | readBit, checkAck);
     if (size > 1) {
-        i2c_master_read(cmd, data_rd, size - 1, ACK_VAL);
+        i2c_master_read(cmd, data_rd, size - 1, masterAck);
     }
-    i2c_master_read_byte(cmd, data_rd + size - 1, NACK_VAL);
+    i2c_master_read_byte(cmd, data_rd + size - 1, masterNack);
     i2c_master_stop(cmd);
     esp_err_t ret = i2c_master_cmd_begin(i2c_num, cmd, 1000 / portTICK_RATE_MS);
     i2c_cmd_link_delete(cmd);
@@ -54,8 +54,8 @@ static esp_err_t i2c_example_master_write_slave(i2c_port_t i2c_num, uint8_t* dat
 {
     i2c_cmd_handle_t cmd = i2c_cmd_link_create();
     i2c_master_start(cmd);
-    i2c_master_write_byte(cmd, ( ESP_SLAVE_ADDR << 1 ) | WRITE_BIT, ACK_CHECK_EN);
-    i2c_master_write(cmd, data_wr, size, ACK_CHECK_EN);
+    i2c_master_write_byte(cmd, ( slaveAddress << 1 ) | writeBit, checkAck);
+    i2c_master_write(cmd, data_wr, size, checkAck);
     i2c_master_stop(cmd);
     esp_err_t ret = i2c_master_cmd_begin(i2c_num, cmd, 1000 / portTICK_RATE_MS);
     i2c_cmd_link_delete(cmd);
@@ -67,19 +67,19 @@ static esp_err_t i2c_example_master_write_slave(i2c_port_t i2c_num, uint8_t* dat
  */
 static void i2c_example_master_init()
 {
-    //int i2c_master_port = I2C_EXAMPLE_MASTER_NUM;
-    i2c_port_t i2c_master_port = I2C_EXAMPLE_MASTER_NUM;
+    //int i2c_master_port = masterPortNum;
+    i2c_port_t i2c_master_port = masterPortNum;
     i2c_config_t conf;
     conf.mode = I2C_MODE_MASTER;
-    conf.sda_io_num = I2C_EXAMPLE_MASTER_SDA_IO;
+    conf.sda_io_num = masterSDA;
     conf.sda_pullup_en = GPIO_PULLUP_ENABLE;
-    conf.scl_io_num = I2C_EXAMPLE_MASTER_SCL_IO;
+    conf.scl_io_num = masterSCL;
     conf.scl_pullup_en = GPIO_PULLUP_ENABLE;
-    conf.master.clk_speed = I2C_EXAMPLE_MASTER_FREQ_HZ;
+    conf.master.clk_speed = masterClockFrequency;
     i2c_param_config(i2c_master_port, &conf);
     i2c_driver_install(i2c_master_port, conf.mode,
-                       I2C_EXAMPLE_MASTER_RX_BUF_DISABLE,
-                       I2C_EXAMPLE_MASTER_TX_BUF_DISABLE, 0);
+                       masterReceivingBufferLen,
+                       masterTransmissionBufferLen, 0);
 }
 
 /**
@@ -87,19 +87,19 @@ static void i2c_example_master_init()
  */
 static void i2c_example_slave_init()
 {
-    i2c_port_t i2c_slave_port = I2C_EXAMPLE_SLAVE_NUM;
+    i2c_port_t i2c_slave_port = slavePortNum;
     i2c_config_t conf_slave;
-    conf_slave.sda_io_num = I2C_EXAMPLE_SLAVE_SDA_IO;
+    conf_slave.sda_io_num = slaveSDA;
     conf_slave.sda_pullup_en = GPIO_PULLUP_ENABLE;
-    conf_slave.scl_io_num = I2C_EXAMPLE_SLAVE_SCL_IO;
+    conf_slave.scl_io_num = slaveSCL;
     conf_slave.scl_pullup_en = GPIO_PULLUP_ENABLE;
     conf_slave.mode = I2C_MODE_SLAVE;
     conf_slave.slave.addr_10bit_en = 0;
-    conf_slave.slave.slave_addr = ESP_SLAVE_ADDR;
+    conf_slave.slave.slave_addr = slaveAddress;
     i2c_param_config(i2c_slave_port, &conf_slave);
     i2c_driver_install(i2c_slave_port, conf_slave.mode,
-                       I2C_EXAMPLE_SLAVE_RX_BUF_LEN,
-                       I2C_EXAMPLE_SLAVE_TX_BUF_LEN, 0);
+                       slaveReceivingBufferLen,
+                       slaveTransmissionBufferLen, 0);
 }
 
 /**
@@ -107,14 +107,16 @@ static void i2c_example_slave_init()
  */
 static void disp_buf(uint8_t* buf, int len)
 {
+	std::cout << std::hex;
     int i;
     for (i = 0; i < len; i++) {
-        printf("%02x ", buf[i]);
-        if (( i + 1 ) % 16 == 0) {
-            printf("\n");
+        std::cout << int(buf[i]) << ' ';
+		if (( i + 1 ) % 16 == 0) {
+			std::cout << '\n';
         }
     }
-    printf("\n");
+	std::cout << '\n';
+	std::cout << std::dec;
 }
 
 static void i2c_test_task(void* arg)
@@ -122,70 +124,72 @@ static void i2c_test_task(void* arg)
     int i = 0;
     int ret;
     uint32_t task_idx = (uint32_t) arg;
-    uint8_t* data = (uint8_t*) malloc(DATA_LENGTH);
-    uint8_t* data_wr = (uint8_t*) malloc(DATA_LENGTH);
-    uint8_t* data_rd = (uint8_t*) malloc(DATA_LENGTH);
+	
+	uint8_t * data = new uint8_t[dataLength];
+	uint8_t * data_wr = new uint8_t[dataLength];
+	uint8_t * data_rd = new uint8_t[dataLength];
+	
     int cnt = 0;
     while (1) {
-        printf("test cnt: %d\n", cnt++);
+		std::cout << "==================\n";
+		std::cout << "test count: " << cnt++ << "\n";
+		std::cout << "==================\n";
         xSemaphoreGive(print_mux);
-        vTaskDelay(( DELAY_TIME_BETWEEN_ITEMS_MS * ( task_idx + 1 ) ) / portTICK_RATE_MS);
+        //vTaskDelay(( delayTimeBetweenItemsMS * ( task_idx + 1 ) ) / portTICK_RATE_MS);
         //---------------------------------------------------
-        for (i = 0; i < DATA_LENGTH; i++) {
+        for (i = 0; i < dataLength; i++) {
             data[i] = i;
         }
         xSemaphoreTake(print_mux, portMAX_DELAY);
-        size_t d_size = i2c_slave_write_buffer(I2C_EXAMPLE_SLAVE_NUM, data, RW_TEST_LENGTH, 1000 / portTICK_RATE_MS);
+        size_t d_size = i2c_slave_write_buffer(slavePortNum, data, rwTestLength, 1000 / portTICK_RATE_MS);
         if (d_size == 0) {
-            printf("i2c slave tx buffer full\n");
-            ret = i2c_example_master_read_slave(I2C_EXAMPLE_MASTER_NUM, data_rd, DATA_LENGTH);
+			std::cout << "slave transmission buffer is FULL!\n";
+            ret = i2c_example_master_read_slave(masterPortNum, data_rd, dataLength);
         } else {
-            ret = i2c_example_master_read_slave(I2C_EXAMPLE_MASTER_NUM, data_rd, RW_TEST_LENGTH);
+            ret = i2c_example_master_read_slave(masterPortNum, data_rd, rwTestLength);
         }
 
         if (ret == ESP_ERR_TIMEOUT) {
-            printf("I2C timeout\n");
-            printf("*********\n");
+			std::cout << "I2C TIME_OUT\n";
         } else if (ret == ESP_OK) {
-            printf("*******************\n");
-            printf("TASK[%d]  MASTER READ FROM SLAVE\n", task_idx);
-            printf("*******************\n");
-            printf("====TASK[%d] Slave buffer data ====\n", task_idx);
+			std::cout << "TASK[" << task_idx << "] Slave buffer data:\n";
             disp_buf(data, d_size);
-            printf("====TASK[%d] Master read ====\n", task_idx);
+			std::cout << "TASK[" << task_idx << "] master read:\n";
             disp_buf(data_rd, d_size);
         } else {
-            printf("%s: Master read slave error, IO not connected...\n", esp_err_to_name(ret));
+			std::cout << esp_err_to_name(ret) << ": Master read slave error, IO not connected...\n";
         }
         xSemaphoreGive(print_mux);
-        vTaskDelay(( DELAY_TIME_BETWEEN_ITEMS_MS * ( task_idx + 1 ) ) / portTICK_RATE_MS);
+        //vTaskDelay(( delayTimeBetweenItemsMS * ( task_idx + 1 ) ) / portTICK_RATE_MS);
         //---------------------------------------------------
         int size;
-        for (i = 0; i < DATA_LENGTH; i++) {
+        for (i = 0; i < dataLength; i++) {
             data_wr[i] = i + 10;
         }
         xSemaphoreTake(print_mux, portMAX_DELAY);
         //we need to fill the slave buffer so that master can read later
-        ret = i2c_example_master_write_slave( I2C_EXAMPLE_MASTER_NUM, data_wr, RW_TEST_LENGTH);
+        ret = i2c_example_master_write_slave( masterPortNum, data_wr, rwTestLength);
         if (ret == ESP_OK) {
-            size = i2c_slave_read_buffer( I2C_EXAMPLE_SLAVE_NUM, data, RW_TEST_LENGTH, 1000 / portTICK_RATE_MS);
+            size = i2c_slave_read_buffer( slavePortNum, data, rwTestLength, 1000 / portTICK_RATE_MS);
         }
         if (ret == ESP_ERR_TIMEOUT) {
-            printf("I2C timeout\n");
+			std::cout << "I2C TIME_OUT\n";
         } else if (ret == ESP_OK) {
-            printf("*******************\n");
-            printf("TASK[%d]  MASTER WRITE TO SLAVE\n", task_idx);
-            printf("*******************\n");
-            printf("----TASK[%d] Master write ----\n", task_idx);
-            disp_buf(data_wr, RW_TEST_LENGTH);
-            printf("----TASK[%d] Slave read: [%d] bytes ----\n", task_idx, size);
+			std::cout << "Task[" << task_idx << "] master write:\n";
+            disp_buf(data_wr, rwTestLength);
+			std::cout << "Task[" << task_idx << "] slave read: [" << size << "] bytes:\n";
             disp_buf(data, size);
         } else {
-            printf("TASK[%d] %s: Master write slave error, IO not connected....\n", task_idx, esp_err_to_name(ret));
+			std::cout << "Task [" << task_idx << "] " << esp_err_to_name(ret) << ": Master write slave error, IO not connected...\n";
         }
         xSemaphoreGive(print_mux);
-        vTaskDelay(( DELAY_TIME_BETWEEN_ITEMS_MS * ( task_idx + 1 ) ) / portTICK_RATE_MS);
+        vTaskDelay(( delayTimeBetweenItemsMS * ( task_idx + 1 ) ) / portTICK_RATE_MS);
     }
+	
+	delete data;
+	delete data_wr;
+	delete data_rd;
+	
 }
 
 extern "C" void app_main()
@@ -193,8 +197,8 @@ extern "C" void app_main()
     print_mux = xSemaphoreCreateMutex();
     i2c_example_slave_init();
     i2c_example_master_init();
-    xTaskCreate(i2c_test_task, "i2c_test_task_0", 1024 * 2, (void* ) 0, 10, NULL);
-  //  xTaskCreate(i2c_test_task, "i2c_test_task_1", 1024 * 2, (void* ) 1, 10, NULL);
+  //  xTaskCreate(i2c_test_task, "i2c_test_task_0", 1024 * 2, (void* ) 0, 10, NULL);
+    xTaskCreate(i2c_test_task, "i2c_test_task_1", 1024 * 2, (void* ) 1, 10, NULL);
 	
 }
 
