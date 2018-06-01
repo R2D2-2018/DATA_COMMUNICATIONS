@@ -1,5 +1,6 @@
 #include "ESP32.hpp"
 #include "I2C.hpp"
+#include "TWI.hpp"
 #include "memory_map.hpp"
 #include "wrap-hwlib.hpp"
 
@@ -8,7 +9,7 @@
 int main() {
     WDT->WDT_MR = WDT_MR_WDDIS;
 
-    hwlib::wait_ms(2500);
+    // hwlib::wait_ms(2500);
     /*
 
     auto bus = due::spi_bus_due();
@@ -47,10 +48,17 @@ int main() {
     */
 
     // hwlib::cout << "hello world" << hwlib::endl;
+    
+    constexpr uint32_t twiSpeed = 400000;
 
     auto bus = I2C::I2C<0x03>();
+    auto twi = TWI<twiSpeed>();
 
-    bus.getDeviceAddress();
+    uint8_t writeOp[] = {0x01, 0x02};
+    while (true) {
+        twi.write(0x28, writeOp, sizeof(writeOp));
+        hwlib::wait_ms(500);
+    }
 
     return 0;
 }
