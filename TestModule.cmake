@@ -14,7 +14,6 @@ set (sources ${sources}
     src/libc-stub.cpp
     src/ESP32.hpp
     src/memory_map.hpp
-    src/I2C.cpp
 )
 
 set (build_test build_test)

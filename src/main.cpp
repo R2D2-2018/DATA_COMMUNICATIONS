@@ -51,7 +51,9 @@ int main() {
     auto bus = I2C::I2C();
 
     std::array<uint8_t, 4> arr = {0};
-    // bus.write<4>(0x28, arr);
+    // const uint8_t addr = 0x28;
+    auto ret = bus.read<arr.size()>(0x28);
+    // auto ret = bus.read(0x28);
 
     return 0;
 }

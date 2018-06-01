@@ -13,4 +13,5 @@ include_directories (${catch}/single_include)
 set (sources
     ./src/ESP32.cpp
     ./src/memory_map.hpp
+    ./src/I2C.cpp
 )
