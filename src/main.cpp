@@ -48,12 +48,9 @@ int main() {
 
     // hwlib::cout << "hello world" << hwlib::endl;
 
-    auto bus = I2C::I2C();
+    auto bus = I2C::I2C<0x03>();
 
-    std::array<uint8_t, 4> arr = {0};
-    // const uint8_t addr = 0x28;
-    auto ret = bus.read<arr.size()>(0x28);
-    // auto ret = bus.read(0x28);
+    bus.getDeviceAddress();
 
     return 0;
 }

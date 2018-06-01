@@ -4,7 +4,7 @@ set (sources ${sources}
     src/main.cpp
     src/wrap-hwlib.cpp
     src/libc-stub.cpp
-    src/I2C.cpp
+    src/I2C.hpp
 )
 
 add_definitions (-DBMPTK_TARGET_arduino_due
