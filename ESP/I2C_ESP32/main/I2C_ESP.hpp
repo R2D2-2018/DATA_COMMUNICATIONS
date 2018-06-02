@@ -8,7 +8,6 @@
 #ifndef I2C_ESP_HPP
 #define I2C_ESP_HPP
 
-#include <memory>
 #include "driver/i2c.h"
 
 ///< SLAVE ADDRESS AND RW BIT CONFIGURATION
