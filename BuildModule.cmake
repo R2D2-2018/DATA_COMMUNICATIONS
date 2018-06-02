@@ -1,4 +1,4 @@
-include (../../flags.cmake)
+include (${build_environment}/flags.cmake)
 
 #JULIAN'S MAGIC // BUILD
 set (sources

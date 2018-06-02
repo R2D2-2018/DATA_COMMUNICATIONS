@@ -13,3 +13,7 @@ ESP/master/sdkconfig
 ESP/masterAndSlave/build
 ESP/masterAndSlave/build/*
 ESP/masterAndSlave/sdkconfig
+
+ESP/I2C_ESP32/build/*
+ESP/I2C_ESP32/sdkconfig
+ESP/I2C_ESP32/sdkconfig.old
