@@ -1,6 +1,4 @@
 ---
-AlignConsecutiveAssignments: true
-
 AllowShortBlocksOnASingleLine: false
 
 AllowShortCaseLabelsOnASingleLine: false
