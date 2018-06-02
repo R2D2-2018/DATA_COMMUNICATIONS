@@ -1,36 +1,30 @@
 #ifndef TWI_HPP
 #define TWI_HPP
 
+/**
+ * @file TWI.hpp
+ * @brief Abstraction for the TWI interface
+ * @author Niels de Waal
+ * @license see LICENSE
+ */
+
 #include "wrap-hwlib.hpp"
 
 #include <array>
 
+namespace TWI {
+
 template <uint32_t SPEED>
 class TWI {
   private:
-    static constexpr uint32_t masterClock = 84000000;
+    static constexpr uint32_t masterClock = 84000000; ///< Master clock rate 84MHz
 
+    /**
+     * @brief Function to set the TWI clock
+     *
+     * Function calculates the TWI timings required to reach the specified speed.
+     */
     constexpr auto setClock() -> void {
-        /*
-        uint32_t dwCkDiv = 0 ;
-        uint32_t dwClDiv = 0;
-        uint32_t dwOk = 0 ;
-
-        while ( !dwOk )
-        {
-            dwClDiv = ((masterClock / (2 * SPEED)) - 4) / (1<<dwCkDiv) ;
-
-            if ( dwClDiv <= 255 )
-            {
-                dwOk = 1 ;
-            }
-            else
-            {
-                dwCkDiv++ ;
-            }
-        }
-        */
-
         uint32_t ckdiv    = 0;
         uint32_t c_lh_div = 0;
 
@@ -52,15 +46,34 @@ class TWI {
         TWI0->TWI_CWGR = TWI_CWGR_CLDIV(c_lh_div) | TWI_CWGR_CHDIV(c_lh_div) | TWI_CWGR_CKDIV(ckdiv);
     }
 
-    auto writeByte(uint8_t data) -> void;
-    auto readByte(uint8_t address) -> uint8_t;
+    /**
+     * @brief Write single byte to device.
+     *
+     * Function writes single byte to a device.
+     *
+     * @param[in]       data    Byte value
+     */
+    auto writeByte(const uint8_t data) -> void {
+        TWI0->TWI_THR = data;
+    }
 
-    void write_byte(uint8_t byte) {
-        TWI0->TWI_THR = byte;
-        //hwlib::wait_ms(1);
+    /**
+     * @brief Read single byte from device.
+     *
+     * Read a single byte from a device.
+     *
+     * @return The byte that has been read from the device.
+     */
+    auto readByte() -> uint8_t {
+        return 0;
     }
 
   public:
+    /**
+     * @brief TWI constructor.
+     *
+     * Constructor for the TWI interface.
+     */
     TWI() {
         auto config_pin = [](uint32_t pin) {
             PIOA->PIO_ABSR &= (~pin & PIOA->PIO_ABSR);
@@ -86,28 +99,35 @@ class TWI {
         setClock();
     }
 
-    void write(uint_fast8_t a, const uint8_t data[], size_t n) {
-        TWI0->TWI_MMR  = 0;                 /**< Reset master mode register */
-        TWI0->TWI_MMR  = 0 << 12 | a << 16; /**< Set write and address */
-        TWI0->TWI_IADR = 0;                 /**< Clear internal address */
+    /**
+     * @brief TWI write command
+     *
+     * Function writes the data containd in the data array to the device specified address.
+     *
+     * @param[in]       address Address of the device to write to.
+     * @param[in]       data    Array containing the data which should be written.
+     */
+    template <std::size_t LENGTH>
+    auto write(const uint8_t address, const std::array<uint8_t, LENGTH> data) -> void {
+        TWI0->TWI_MMR  = 0;                       /**< Reset master mode register */
+        TWI0->TWI_MMR  = 0 << 12 | address << 16; /**< Set write and address */
+        TWI0->TWI_IADR = 0;                       /**< Clear internal address */
 
         uint32_t status = 0;
 
-        for (size_t i = 0; i < n; ++i) {
+        for (const auto &byte : data) {
             status = TWI0->TWI_SR;
-            if (status & TWI_SR_NACK)
+            if (status & TWI_SR_NACK) {
                 hwlib::cout << "status & NACK" << hwlib::endl;
+            }
 
             if (status & TWI_SR_TXRDY) {
-                write_byte(*(data + i));
+                writeByte(byte);
             }
         }
 
         while (1) {
             status = TWI0->TWI_SR;
-            if (status & TWI_SR_NACK) {
-                return;
-            }
             if (status & TWI_SR_TXRDY) {
                 break;
             }
@@ -118,5 +138,7 @@ class TWI {
             ;
     }
 };
+
+} // namespace TWI
 
 #endif // TWI_HPP

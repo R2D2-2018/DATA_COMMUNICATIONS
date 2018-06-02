@@ -48,15 +48,15 @@ int main() {
     */
 
     // hwlib::cout << "hello world" << hwlib::endl;
-    
+
     constexpr uint32_t twiSpeed = 400000;
 
     auto bus = I2C::I2C<0x03>();
-    auto twi = TWI<twiSpeed>();
+    auto twi = TWI::TWI<twiSpeed>();
 
-    uint8_t writeOp[] = {0x01, 0x02};
+    std::array<uint8_t, 2> writeOp = {0x28, 0x30};
     while (true) {
-        twi.write(0x28, writeOp, sizeof(writeOp));
+        twi.write<writeOp.size()>(0x28, writeOp);
         hwlib::wait_ms(500);
     }
 
