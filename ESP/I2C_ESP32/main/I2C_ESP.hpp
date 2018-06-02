@@ -8,15 +8,16 @@
 #ifndef I2C_ESP_HPP
 #define I2C_ESP_HPP
 
+#include <memory>
 #include "driver/i2c.h"
 
 ///< SLAVE ADDRESS AND RW BIT CONFIGURATION
-constexpr i2c_rw_t writeBit = i2c_rw_t::I2C_MASTER_WRITE;	///< Master WRITE bit
-constexpr i2c_rw_t readBit = i2c_rw_t::I2C_MASTER_READ;		///< Master READ bit
+static constexpr i2c_rw_t writeBit = i2c_rw_t::I2C_MASTER_WRITE;	///< Master WRITE bit
+static constexpr i2c_rw_t readBit = i2c_rw_t::I2C_MASTER_READ;		///< Master READ bit
 
 ///< ACK CONFIGURATION
-constexpr i2c_ack_type_t masterAck = i2c_ack_type_t::I2C_MASTER_ACK;	///< Master ACK value
-constexpr i2c_ack_type_t masterNack = i2c_ack_type_t::I2C_MASTER_NACK;	///< Master NACK value (false)
+static constexpr i2c_ack_type_t masterAck = i2c_ack_type_t::I2C_MASTER_ACK;	///< Master ACK value
+static constexpr i2c_ack_type_t masterNack = i2c_ack_type_t::I2C_MASTER_NACK;	///< Master NACK value (false)
 
 class I2cEsp {
 private:
@@ -31,8 +32,8 @@ private:
 	bool isMaster;			///< Operating mode: true = master; false = slave
 	bool checkAck;			///< Whether to check for ACKs
 	
-	int masterClockFrequency = 100000;
-	uint8_t slaveAddress = 0x28;
+	static constexpr int masterClockFrequency = 100000;
+	static constexpr uint8_t slaveAddress = 0x28;
 	
 	i2c_port_t portNum;		///< I2C port number: could be port 0 or port 1
 	gpio_num_t scl;			///< Serial Clock pin

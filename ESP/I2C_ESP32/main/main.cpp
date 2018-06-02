@@ -6,8 +6,8 @@ extern "C" {
 }
 
 void app_main() {
-    auto led = LED();
-    led.blinkInfinitely(1000);
+   	///< auto led = LED();
+   	///< led.blinkInfinitely(1000);	///< Infinite loop; will block other code from executing
 	
 	gpio_num_t masterSDA = gpio_num_t::GPIO_NUM_18;
 	gpio_num_t masterSLC = gpio_num_t::GPIO_NUM_19;

@@ -22,3 +22,5 @@ Language: 'Cpp'
 NamespaceIndentation: None
 
 Standard: 'Cpp11'
+
+AlignConsecutiveAssignments: true
