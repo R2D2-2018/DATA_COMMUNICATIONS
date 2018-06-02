@@ -1,3 +1,10 @@
+/**
+ * @file
+ * @brief     I2C class for the ESP32
+ * @author    Roxanne van der Pol
+ * @license   MIT
+ */
+
 #ifndef I2C_ESP_HPP
 #define I2C_ESP_HPP
 
@@ -17,27 +24,66 @@ private:
 	int txBufferLength = 2 * dataBufferLength;	///< Transmission buffer length
 	int rxBufferLength = 2 * dataBufferLength;	///< Receiving buffer length
 	
-	uint8_t * dataBuffer;
-	uint8_t * txBuffer;
-	uint8_t * rxBuffer;
+	uint8_t * dataBuffer;	///< Data buffer
+	uint8_t * txBuffer;		///< Tranmission buffer
+	uint8_t * rxBuffer;		///< Receive buffer
 	
-	bool isMaster;
-	bool checkAck;
+	bool isMaster;			///< Operating mode: true = master; false = slave
+	bool checkAck;			///< Whether to check for ACKs
 	
 	int masterClockFrequency = 100000;
 	uint8_t slaveAddress = 0x28;
 	
-	i2c_port_t portNum;
-	gpio_num_t scl;
-	gpio_num_t sda;
+	i2c_port_t portNum;		///< I2C port number: could be port 0 or port 1
+	gpio_num_t scl;			///< Serial Clock pin
+	gpio_num_t sda;			///< Data pin
 	
 public:
+	/**
+	* @brief Constructor of class
+	*
+	* Fills in the config for master if isMaster = true; slave if false, and
+	* instantiates the buffers with their respective bufferLenghts.
+	*
+	* @param[in]     gpio_num_t sda   GPIO pin for data 
+	* @param[in]     gpio_num_t scl   GPIO pin for Serial Clock
+	* @param[in]     bool isMaster    Whether device is master; false by default
+	*/
 	I2cEsp(gpio_num_t sda, gpio_num_t slc, bool isMaster = false);
+	/**
+	* @brief Deconstructor of class
+	*
+	* Deletes buffers made in constructor to release resources
+	*
+	*/
 	~I2cEsp();
 	
+	/**
+	* @brief Read output from connected device
+	*
+	* Read output from the connected device and place it in
+	* the rxBuffer (receive buffer) using the I2C protocol.
+	*
+	* @return 0 if everything went the way it should; -1 if not
+	*/
 	int read();
+	/**
+	* @brief Write input to connected device
+	*
+	* Write input from txBuffer (transmission buffer) to the
+	* connected device using the I2C protocol.
+	*
+	* @return void
+	*/
 	void write();
 	
+	/**
+	* @brief Print contents of buffer
+	*
+	* Print the contents of the transmission- or receive buffer.
+	*
+	* @return void
+	*/
 	void print();
 	
 };
