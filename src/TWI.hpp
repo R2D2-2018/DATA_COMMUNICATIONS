@@ -3,7 +3,7 @@
 
 /**
  * @file TWI.hpp
- * @brief Abstraction for the TWI interface
+ * @brief Abstraction for the TWI (two-wire interface) interface
  * @author Niels de Waal
  * @license see LICENSE
  */
@@ -25,25 +25,22 @@ class TWI {
      * Function calculates the TWI timings required to reach the specified speed.
      */
     constexpr auto setClock() -> void {
-        uint32_t ckdiv    = 0;
-        uint32_t c_lh_div = 0;
+        uint32_t ckdiv  = 0; ///< Clock divider
+        uint32_t cLHDiv = 0; ///< Clock low and high divider
 
         if (SPEED > 400000) {
             return;
         }
 
-        c_lh_div = masterClock / (SPEED * 2) - 4;
+        cLHDiv = masterClock / (SPEED * 2) - 4;
 
-        /* cldiv must fit in 8 bits, ckdiv must fit in 3 bits */
-        while ((c_lh_div > 0xFF) && (ckdiv < 7)) {
-            /* Increase clock divider */
-            ckdiv++;
-            /* Divide cldiv value */
-            c_lh_div /= 2;
+        while ((cLHDive > 0xFF) && (ckdiv < 7)) { ///< cldiv must fit in 8 bits, ckdiv must fit in 3 bits
+            ckdiv++;                              ///< Increase clock devider
+            cLHDiv /= 2;
         }
 
         /* set clock waveform generator register */
-        TWI0->TWI_CWGR = TWI_CWGR_CLDIV(c_lh_div) | TWI_CWGR_CHDIV(c_lh_div) | TWI_CWGR_CKDIV(ckdiv);
+        TWI0->TWI_CWGR = TWI_CWGR_CLDIV(cLHDiv) | TWI_CWGR_CHDIV(cLHDiv) | TWI_CWGR_CKDIV(ckdiv);
     }
 
     /**
