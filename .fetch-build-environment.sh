@@ -12,3 +12,6 @@ fi
 export R2D2_BUILD_ENVIRONMENT=${build_environment}
 
 echo "${build_environment}"
+
+
+

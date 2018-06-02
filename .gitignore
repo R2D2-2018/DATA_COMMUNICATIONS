@@ -1,3 +1,7 @@
 build/*
 build_test/*
 .vscode/*
+
+ESP/I2C_ESP32/build/*
+ESP/I2C_ESP32/sdkconfig
+ESP/I2C_ESP32/sdkconfig.old

@@ -7,7 +7,6 @@
  * @author      Niels de Waal & Roxanne van der Pol
  * @license     MIT
  */
-
 enum class BaseAddresses { GPIO_FUNC_OUT_SEL_CFG_REG = 0x530 };
 
 enum class MemoryBlock {
