@@ -8,4 +8,3 @@
 
 // VERTICAL_SLICE_2
 #include "test_VS2-EnumForRegisters.hpp"
->>>>>>> c655f164f1e8faa28a8fda13f1c1de1701398eaa

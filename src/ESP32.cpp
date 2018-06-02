@@ -30,9 +30,5 @@ int ESP32::readBuffer() {
     return 0;
 }
 
-<<<<<<< HEAD
-void ESP32::writeBuffer(int data){
-=======
 void ESP32::writeBuffer(int data) {
->>>>>>> c655f164f1e8faa28a8fda13f1c1de1701398eaa
 }
