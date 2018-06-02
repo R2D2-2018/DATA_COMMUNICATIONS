@@ -39,7 +39,6 @@ class TWI {
             cLHDiv /= 2;
         }
 
-        /* set clock waveform generator register */
         TWI0->TWI_CWGR = TWI_CWGR_CLDIV(cLHDiv) | TWI_CWGR_CHDIV(cLHDiv) | TWI_CWGR_CKDIV(ckdiv);
     }
 
@@ -106,9 +105,9 @@ class TWI {
      */
     template <std::size_t LENGTH>
     auto write(const uint8_t address, const std::array<uint8_t, LENGTH> data) -> void {
-        TWI0->TWI_MMR  = 0;                       /**< Reset master mode register */
-        TWI0->TWI_MMR  = 0 << 12 | address << 16; /**< Set write and address */
-        TWI0->TWI_IADR = 0;                       /**< Clear internal address */
+        TWI0->TWI_MMR  = 0;                       ///< Reset master mode register
+        TWI0->TWI_MMR  = 0 << 12 | address << 16; ///< Set write and address
+        TWI0->TWI_IADR = 0;                       ///< Clear internal address
 
         uint32_t status = 0;
 
