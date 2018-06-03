@@ -5,21 +5,21 @@
 #include "driver/i2c.h"
 
 ///< DATA_LEN & DELAY_TIME CONFIGURATION
-constexpr int dataLength = 512; 							///< Data buffer length for test_buffer
-constexpr int rwTestLength = 64; 							///< Data length for r/w test, any value from 0 - dataLength
-constexpr int delayTimeBetweenItemsMS = 1234;				///< Delay time between different test items
+constexpr int dataLength = 512; 							///< dataBuffer buffer length for test_buffer
+constexpr int rwTestLength = 64; 							///< dataBuffer length for r/w test, any value from 0 - dataLength
+
 
 ///< SLAVE_CONFIGURATION
 constexpr gpio_num_t slaveSCL = gpio_num_t::GPIO_NUM_26;	///< GPIO number for slave CLK
-constexpr gpio_num_t slaveSDA = gpio_num_t::GPIO_NUM_25;	///< GPIO number for slave DATA
-constexpr i2c_port_t slavePortNum = i2c_port_t::I2C_NUM_0;	///< Slave port number
+constexpr gpio_num_t slaveSDA = gpio_num_t::GPIO_NUM_25;	///< GPIO number for slave dataBuffer
+//constexpr i2c_port_t slavePortNum = i2c_port_t::I2C_NUM_0;	///< Slave port number
 constexpr int slaveTransmissionBufferLen = 2*dataLength;	///< Slave transmission buffer size
 constexpr int slaveReceivingBufferLen = 2*dataLength;		///< Slave receiving buffer size
 
 //< MASTER CONFIGURATION
 constexpr gpio_num_t masterSCL = gpio_num_t::GPIO_NUM_19;	///< GPIO number for master CLK
-constexpr gpio_num_t masterSDA = gpio_num_t::GPIO_NUM_18;	///< GPIO number for master DATA
-constexpr i2c_port_t masterPortNum = i2c_port_t::I2C_NUM_1;	///< Master port number
+constexpr gpio_num_t masterSDA = gpio_num_t::GPIO_NUM_18;	///< GPIO number for master dataBuffer
+//constexpr i2c_port_t masterPortNum = i2c_port_t::I2C_NUM_1;	///< Master port number
 constexpr int masterTransmissionBufferLen = 0;				///< Master transmission buffer size
 constexpr int masterReceivingBufferLen = 0;					///< Master receiving buffer size
 constexpr int masterClockFrequency = 100000;				///< Master clock frequency
@@ -38,20 +38,19 @@ SemaphoreHandle_t print_mux = NULL;
 
 class I2cEsp {
 private:
+
+	static constexpr i2c_port_t masterPortNum = i2c_port_t::I2C_NUM_1;	///< Master port number
+	static constexpr i2c_port_t slavePortNum = i2c_port_t::I2C_NUM_0;	///< Slave port number
 	
-	uint8_t * data;
-	uint8_t * data_wr;
-	uint8_t * data_rd;
+	uint8_t * dataBuffer = new uint8_t[dataLength];
+	uint8_t * txBuffer = new uint8_t[dataLength];
+	uint8_t * rxBuffer = new uint8_t[dataLength];
 	
 	bool isMaster = false;
 	
 public:
 	I2cEsp(bool isMaster = false):
 	isMaster(isMaster) {
-		
-		uint8_t * data = new uint8_t[dataLength];
-		uint8_t * data_wr = new uint8_t[dataLength];
-		uint8_t * data_rd = new uint8_t[dataLength];
 		if(isMaster) {
 			i2c_port_t i2c_master_port = masterPortNum;
 			i2c_config_t conf;
@@ -82,13 +81,14 @@ public:
 		}
 	}
 	~I2cEsp() {
-		delete data;
-		delete data_wr;
-		delete data_rd;		
+		delete dataBuffer;
+		delete txBuffer;
+		delete rxBuffer;		
 	}
 	
-	esp_err_t read(i2c_port_t i2c_num, uint8_t * data_rd, size_t size) {
+	esp_err_t read(uint8_t * rxBuffer, size_t size) {		
 		if(isMaster) {
+			this -> rxBuffer = rxBuffer;
 			if(size == 0) {
 				return ESP_OK;
 			}
@@ -96,44 +96,54 @@ public:
 			i2c_master_start(cmd);
 			i2c_master_write_byte(cmd, ( slaveAddress << 1 ) | readBit, checkAck);
 			if(size > 1) {
-				i2c_master_read(cmd, data_rd, size - 1, masterAck);
+				i2c_master_read(cmd, rxBuffer, size - 1, masterAck);
 			}
-			i2c_master_read_byte(cmd, data_rd + size - 1, masterNack);
+			i2c_master_read_byte(cmd, rxBuffer + size - 1, masterNack);
 			i2c_master_stop(cmd);
-			esp_err_t ret = i2c_master_cmd_begin(i2c_num, cmd, 1000 / portTICK_RATE_MS);
+			esp_err_t ret = i2c_master_cmd_begin(masterPortNum, cmd, 1000 / portTICK_RATE_MS);
 			i2c_cmd_link_delete(cmd);
+			
 			return ret;
 		}
 		return -1;
 	}
 	
-
-	///< Master writes to slave
-	static esp_err_t masterWriteSlave(i2c_port_t i2c_num, uint8_t* data_wr, size_t size) {
-		i2c_cmd_handle_t cmd = i2c_cmd_link_create();
-		i2c_master_start(cmd);
-		i2c_master_write_byte(cmd, ( slaveAddress << 1 ) | writeBit, checkAck);
-		i2c_master_write(cmd, data_wr, size, checkAck);
-		i2c_master_stop(cmd);
-		esp_err_t ret = i2c_master_cmd_begin(i2c_num, cmd, 1000 / portTICK_RATE_MS);
-		i2c_cmd_link_delete(cmd);
-		return ret;
-	}
-
 	///< Slave reads buffer contents and returns int buffer size
-	static int read(uint8_t * data) {
-		int size = i2c_slave_read_buffer( slavePortNum, data, rwTestLength, 1000 / portTICK_RATE_MS);
+	int read(uint8_t * dataBuffer) {
+		this -> dataBuffer = dataBuffer;
+		int size = i2c_slave_read_buffer( slavePortNum, dataBuffer, rwTestLength, 1000 / portTICK_RATE_MS);
+
 		return size;
 	}
+	
+	esp_err_t write(uint8_t * txBuffer, size_t size) {
+		if(isMaster) {
+			this -> txBuffer = txBuffer;
+			i2c_cmd_handle_t cmd = i2c_cmd_link_create();
+			i2c_master_start(cmd);
+			i2c_master_write_byte(cmd, ( slaveAddress << 1 ) | writeBit, checkAck);
+			i2c_master_write(cmd, txBuffer, size, checkAck);
+			i2c_master_stop(cmd);
+			esp_err_t ret = i2c_master_cmd_begin(masterPortNum, cmd, 1000 / portTICK_RATE_MS);
+			i2c_cmd_link_delete(cmd);
+			
+			return ret;		
+		}
+		
+		return -1;
+		
+	}
 
-	///< Slave writes to data buffer and returns size_t buffer size
-	static size_t slaveWriteBuffer(uint8_t * data) {
-		size_t size = i2c_slave_write_buffer(slavePortNum, data, rwTestLength, 1000 / portTICK_RATE_MS);
+	///< Slave writes to dataBuffer buffer and returns size_t buffer size
+	size_t write(uint8_t * dataBuffer) {
+		this -> dataBuffer = dataBuffer;
+		size_t size = i2c_slave_write_buffer(slavePortNum, dataBuffer, rwTestLength, 1000 / portTICK_RATE_MS);
+		
 		return size;
 	}
 
 	///< Print buffer contents
-	static void printBuffer(uint8_t* buf, int len) {
+	void printBuffer(uint8_t* buf, int len) {
 		std::cout << std::hex;
 		int i;
 		for(i = 0; i < len; i++) {
@@ -145,6 +155,35 @@ public:
 		std::cout << '\n';
 		std::cout << std::dec;
 	}
+	
+	void modifyData() {
+		for(int i = 0; i < rwTestLength; ++i) {
+		dataBuffer[i] += 1;
+		}
+	}
+	void modifyRx() {
+		for(int i = 0; i < rwTestLength; ++i) {
+		rxBuffer[i] += 1;
+		}
+	}
+	void modifyTx() {
+		for(int i = 0; i < rwTestLength; ++i) {
+		txBuffer[i] += 1;
+		}
+	}
+	
+	uint8_t * getDataBuffer() {
+		return dataBuffer;
+	}
+	uint8_t * getRxBuffer() {
+		return rxBuffer;
+	}
+	uint8_t * getTxBuffer() {
+		return txBuffer;	
+	}
+	
+	
+	
 };
 
 #endif ///< I2C_ESP_HPP
