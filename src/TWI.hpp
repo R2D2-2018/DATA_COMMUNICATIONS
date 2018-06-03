@@ -25,7 +25,7 @@ class TWI {
      * Function calculates the TWI timings required to reach the specified speed.
      */
     constexpr auto setClock() noexcept -> void {
-        uint32_t ckdiv  = 0; ///< Clock divider
+        uint32_t ckDiv  = 0; ///< Clock divider
         uint32_t cLHDiv = 0; ///< Clock low and high divider
 
         if (SPEED > 400000) {
@@ -34,12 +34,12 @@ class TWI {
 
         cLHDiv = masterClock / (SPEED * 2) - 4;
 
-        while ((cLHDiv > 0xFF) && (ckdiv < 7)) { ///< cldiv must fit in 8 bits, ckdiv must fit in 3 bits
-            ckdiv++;                             ///< Increase clock devider
+        while ((cLHDiv > 0xFF) && (ckDiv < 7)) { ///< cldiv must fit in 8 bits, ckdiv must fit in 3 bits
+            ckDiv++;                             ///< Increase clock devider
             cLHDiv /= 2;
         }
 
-        TWI0->TWI_CWGR = TWI_CWGR_CLDIV(cLHDiv) | TWI_CWGR_CHDIV(cLHDiv) | TWI_CWGR_CKDIV(ckdiv);
+        TWI0->TWI_CWGR = TWI_CWGR_CLDIV(cLHDiv) | TWI_CWGR_CHDIV(cLHDiv) | TWI_CWGR_CKDIV(ckDiv);
     }
 
     /**
