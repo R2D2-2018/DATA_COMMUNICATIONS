@@ -1,6 +1,7 @@
 #ifndef I2C_ESP_HPP
 #define I2C_ESP_HPP
 
+#include <iostream>
 #include "driver/i2c.h"
 
 ///< SLAVE ADDRESS AND RW BIT CONFIGURATION
@@ -32,13 +33,24 @@ private:
 	gpio_num_t sda;
 	
 public:
-	I2cEsp(gpio_num_t sda, gpio_num_t slc, bool isMaster = false);
+	I2cEsp(gpio_num_t & sda, gpio_num_t & slc, bool isMaster = false);
 	~I2cEsp();
 	
 	int read();
-	void write();
+	int write(uint8_t * data, size_t size);
 	
-	void print();
+	void modifyBufferData(int mode = 0);
+	
+	void print(uint8_t * buffer, int bufferLength);
+	
+	///< GETTERS
+	uint8_t * getDataBuffer();
+	uint8_t * getTxBuffer();
+	uint8_t * getRxBuffer();
+	///<
+	int getDataBufferLength();
+	int getTxBufferLength();
+	int getRxBufferLength();
 	
 };
 
