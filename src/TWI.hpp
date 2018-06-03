@@ -24,7 +24,7 @@ class TWI {
      *
      * Function calculates the TWI timings required to reach the specified speed.
      */
-    constexpr auto setClock() -> void {
+    constexpr auto setClock() noexcept -> void {
         uint32_t ckdiv  = 0; ///< Clock divider
         uint32_t cLHDiv = 0; ///< Clock low and high divider
 
@@ -49,7 +49,7 @@ class TWI {
      *
      * @param[in]       data    Byte value
      */
-    auto writeByte(const uint8_t data) -> void {
+    inline auto writeByte(const uint8_t data) noexcept -> void {
         TWI0->TWI_THR = data;
     }
 
@@ -60,8 +60,8 @@ class TWI {
      *
      * @return The byte that has been read from the device.
      */
-    auto readByte() -> uint8_t {
-        return 0;
+    inline auto readByte() noexcept -> uint8_t {
+        return TWI0->TWI_RHR;
     }
 
   public:
@@ -104,7 +104,7 @@ class TWI {
      * @param[in]       data    Array containing the data which should be written.
      */
     template <std::size_t LENGTH>
-    auto write(const uint8_t address, const std::array<uint8_t, LENGTH> data) -> void {
+    auto write(const uint8_t address, const std::array<uint8_t, LENGTH> data) noexcept -> void {
         TWI0->TWI_MMR  = 0;                       ///< Reset master mode register
         TWI0->TWI_MMR  = 0 << 12 | address << 16; ///< Set write and address
         TWI0->TWI_IADR = 0;                       ///< Clear internal address
@@ -132,6 +132,57 @@ class TWI {
         TWI0->TWI_CR = TWI_CR_STOP;
         while (!(TWI0->TWI_SR & TWI_SR_TXCOMP))
             ;
+    }
+
+    /**
+     * @brief TWI read command
+     *
+     * Function reads LENGTH amount of bytes for the attached TWI device.
+     *
+     * @param[in]       address Address of the device from which to read
+     * @return  std::array containing the bytes read from the device
+     */
+    template <std::size_t LENGTH>
+    auto read(const uint8_t address) noexcept -> std::array<uint8_t, LENGTH> {
+        std::array<uint8_t, LENGTH> result = {0};
+
+        TWI0->TWI_MMR  = 0;                       ///< Reset master mode register
+        TWI0->TWI_MMR  = 1 << 12 | address << 16; ///< Set read and address
+        TWI0->TWI_IADR = 0;                       ///< Clear internal address
+
+        uint32_t status         = 0;      ///< Variable for holding status register
+        uint32_t count          = LENGTH; ///< Counter variable for array acces
+        uint8_t stopTransaction = 0;      ///< Byte to indicate that transaction should be stopped
+
+        if (count == 1) { ///< When only one byte needs to be read, transaction should be started and stopped at once.
+            TWI0->TWI_CR    = TWI_CR_START | TWI_CR_STOP;
+            stopTransaction = 1;
+        } else {
+            TWI0->TWI_CR = TWI_CR_START;
+        }
+
+        while (count > 0) {
+            status = TWI0->TWI_SR;
+            if (status & TWI_SR_NACK) {
+                return result;
+            }
+
+            if (count == 1 && !stopTransaction) {
+                TWI0->TWI_CR    = TWI_CR_STOP;
+                stopTransaction = 1;
+            }
+
+            if (!(status & TWI_SR_RXRDY)) {
+                continue;
+            }
+            // *buffer++ = p_twi->TWI_RHR;
+            // std::get<LENGTH - count>(result) = readByte();
+            result[LENGTH - count] = readByte();
+
+            count--;
+        }
+
+        return result;
     }
 };
 
