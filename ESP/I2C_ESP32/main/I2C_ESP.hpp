@@ -38,6 +38,7 @@ SemaphoreHandle_t print_mux = NULL;
 
 class I2cEsp {
 private:
+	
 	uint8_t * data;
 	uint8_t * data_wr;
 	uint8_t * data_rd;
@@ -50,9 +51,32 @@ public:
 		uint8_t * data_wr = new uint8_t[dataLength];
 		uint8_t * data_rd = new uint8_t[dataLength];
 		if(isMaster) {
-			masterInit();
+			i2c_port_t i2c_master_port = masterPortNum;
+			i2c_config_t conf;
+			conf.mode = I2C_MODE_MASTER;
+			conf.sda_io_num = masterSDA;
+			conf.sda_pullup_en = GPIO_PULLUP_ENABLE;
+			conf.scl_io_num = masterSCL;
+			conf.scl_pullup_en = GPIO_PULLUP_ENABLE;
+			conf.master.clk_speed = masterClockFrequency;
+			i2c_param_config(i2c_master_port, &conf);
+			i2c_driver_install(i2c_master_port, conf.mode,
+							   masterReceivingBufferLen,
+							   masterTransmissionBufferLen, 0);
 		} else {
-			slaveInit();
+			i2c_port_t i2c_slave_port = slavePortNum;
+			i2c_config_t conf_slave;
+			conf_slave.sda_io_num = slaveSDA;
+			conf_slave.sda_pullup_en = GPIO_PULLUP_ENABLE;
+			conf_slave.scl_io_num = slaveSCL;
+			conf_slave.scl_pullup_en = GPIO_PULLUP_ENABLE;
+			conf_slave.mode = I2C_MODE_SLAVE;
+			conf_slave.slave.addr_10bit_en = 0;
+			conf_slave.slave.slave_addr = slaveAddress;
+			i2c_param_config(i2c_slave_port, &conf_slave);
+			i2c_driver_install(i2c_slave_port, conf_slave.mode,
+							   slaveReceivingBufferLen,
+							   slaveTransmissionBufferLen, 0);
 		}
 	}
 	~I2cEsp() {
@@ -90,22 +114,6 @@ public:
 		return ret;
 	}
 
-	///< Master initialization
-	static void masterInit() {
-		i2c_port_t i2c_master_port = masterPortNum;
-		i2c_config_t conf;
-		conf.mode = I2C_MODE_MASTER;
-		conf.sda_io_num = masterSDA;
-		conf.sda_pullup_en = GPIO_PULLUP_ENABLE;
-		conf.scl_io_num = masterSCL;
-		conf.scl_pullup_en = GPIO_PULLUP_ENABLE;
-		conf.master.clk_speed = masterClockFrequency;
-		i2c_param_config(i2c_master_port, &conf);
-		i2c_driver_install(i2c_master_port, conf.mode,
-						   masterReceivingBufferLen,
-						   masterTransmissionBufferLen, 0);
-	}
-
 	///< Slave reads buffer contents and returns int buffer size
 	static int slaveReadBuffer(uint8_t * data) {
 		int size = i2c_slave_read_buffer( slavePortNum, data, rwTestLength, 1000 / portTICK_RATE_MS);
@@ -116,23 +124,6 @@ public:
 	static size_t slaveWriteBuffer(uint8_t * data) {
 		size_t size = i2c_slave_write_buffer(slavePortNum, data, rwTestLength, 1000 / portTICK_RATE_MS);
 		return size;
-	}
-
-	///< slave initialization
-	static void slaveInit() {
-		i2c_port_t i2c_slave_port = slavePortNum;
-		i2c_config_t conf_slave;
-		conf_slave.sda_io_num = slaveSDA;
-		conf_slave.sda_pullup_en = GPIO_PULLUP_ENABLE;
-		conf_slave.scl_io_num = slaveSCL;
-		conf_slave.scl_pullup_en = GPIO_PULLUP_ENABLE;
-		conf_slave.mode = I2C_MODE_SLAVE;
-		conf_slave.slave.addr_10bit_en = 0;
-		conf_slave.slave.slave_addr = slaveAddress;
-		i2c_param_config(i2c_slave_port, &conf_slave);
-		i2c_driver_install(i2c_slave_port, conf_slave.mode,
-						   slaveReceivingBufferLen,
-						   slaveTransmissionBufferLen, 0);
 	}
 
 	///< Print buffer contents
