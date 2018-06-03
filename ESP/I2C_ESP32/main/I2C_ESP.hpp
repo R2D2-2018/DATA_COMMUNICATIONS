@@ -43,10 +43,12 @@ private:
 	uint8_t * data_wr;
 	uint8_t * data_rd;
 	
-	bool isMaster;
+	bool isMaster = false;
 	
 public:
-	I2cEsp(bool isMaster = false) {
+	I2cEsp(bool isMaster = false):
+	isMaster(isMaster) {
+		
 		uint8_t * data = new uint8_t[dataLength];
 		uint8_t * data_wr = new uint8_t[dataLength];
 		uint8_t * data_rd = new uint8_t[dataLength];
@@ -84,23 +86,27 @@ public:
 		delete data_wr;
 		delete data_rd;		
 	}
-	///< Master reads from slave
-	static esp_err_t masterReadSlave(i2c_port_t i2c_num, uint8_t* data_rd, size_t size) {
-		if(size == 0) {
-			return ESP_OK;
+	
+	esp_err_t read(i2c_port_t i2c_num, uint8_t * data_rd, size_t size) {
+		if(isMaster) {
+			if(size == 0) {
+				return ESP_OK;
+			}
+			i2c_cmd_handle_t cmd = i2c_cmd_link_create();
+			i2c_master_start(cmd);
+			i2c_master_write_byte(cmd, ( slaveAddress << 1 ) | readBit, checkAck);
+			if(size > 1) {
+				i2c_master_read(cmd, data_rd, size - 1, masterAck);
+			}
+			i2c_master_read_byte(cmd, data_rd + size - 1, masterNack);
+			i2c_master_stop(cmd);
+			esp_err_t ret = i2c_master_cmd_begin(i2c_num, cmd, 1000 / portTICK_RATE_MS);
+			i2c_cmd_link_delete(cmd);
+			return ret;
 		}
-		i2c_cmd_handle_t cmd = i2c_cmd_link_create();
-		i2c_master_start(cmd);
-		i2c_master_write_byte(cmd, ( slaveAddress << 1 ) | readBit, checkAck);
-		if(size > 1) {
-			i2c_master_read(cmd, data_rd, size - 1, masterAck);
-		}
-		i2c_master_read_byte(cmd, data_rd + size - 1, masterNack);
-		i2c_master_stop(cmd);
-		esp_err_t ret = i2c_master_cmd_begin(i2c_num, cmd, 1000 / portTICK_RATE_MS);
-		i2c_cmd_link_delete(cmd);
-		return ret;
+		return -1;
 	}
+	
 
 	///< Master writes to slave
 	static esp_err_t masterWriteSlave(i2c_port_t i2c_num, uint8_t* data_wr, size_t size) {
@@ -115,7 +121,7 @@ public:
 	}
 
 	///< Slave reads buffer contents and returns int buffer size
-	static int slaveReadBuffer(uint8_t * data) {
+	static int read(uint8_t * data) {
 		int size = i2c_slave_read_buffer( slavePortNum, data, rwTestLength, 1000 / portTICK_RATE_MS);
 		return size;
 	}

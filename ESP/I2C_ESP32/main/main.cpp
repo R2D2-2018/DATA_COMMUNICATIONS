@@ -36,9 +36,9 @@ static void twoModesOneESP(void * taskID) {
         size_t d_size = slave.slaveWriteBuffer(data);
         if(d_size == 0) {
 			std::cout << "slave transmission buffer is FULL!\n";
-            ret = master.masterReadSlave(masterPortNum, data_rd, dataLength);
+            ret = master.read(masterPortNum, data_rd, dataLength);
         } else {
-            ret = master.masterReadSlave(masterPortNum, data_rd, rwTestLength);
+            ret = master.read(masterPortNum, data_rd, rwTestLength);
         }
 
         if(ret == ESP_ERR_TIMEOUT) {
@@ -59,7 +59,7 @@ static void twoModesOneESP(void * taskID) {
         ///< The slave buffer needs to be filled so the master can read it later
         ret = master.masterWriteSlave( masterPortNum, data_wr, rwTestLength);
         if(ret == ESP_OK) {
-            size = slave.slaveReadBuffer(data);
+            size = slave.read(data);
         }
         if(ret == ESP_ERR_TIMEOUT) {
 			std::cout << "I2C TIME_OUT\n";
