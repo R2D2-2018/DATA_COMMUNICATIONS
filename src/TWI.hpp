@@ -34,8 +34,8 @@ class TWI {
 
         cLHDiv = masterClock / (SPEED * 2) - 4;
 
-        while ((cLHDive > 0xFF) && (ckdiv < 7)) { ///< cldiv must fit in 8 bits, ckdiv must fit in 3 bits
-            ckdiv++;                              ///< Increase clock devider
+        while ((cLHDiv > 0xFF) && (ckdiv < 7)) { ///< cldiv must fit in 8 bits, ckdiv must fit in 3 bits
+            ckdiv++;                             ///< Increase clock devider
             cLHDiv /= 2;
         }
 
