@@ -175,8 +175,6 @@ class TWI {
             if (!(status & TWI_SR_RXRDY)) {
                 continue;
             }
-            // *buffer++ = p_twi->TWI_RHR;
-            // std::get<LENGTH - count>(result) = readByte();
             result[LENGTH - count] = readByte();
 
             count--;
