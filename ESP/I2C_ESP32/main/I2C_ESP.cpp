@@ -1,6 +1,6 @@
 #include "I2C_ESP.hpp"
 
-
+/*
 I2cEsp::I2cEsp(gpio_num_t & sda, gpio_num_t & scl, bool isMaster):
 	isMaster(isMaster)
 {
@@ -145,3 +145,4 @@ int I2cEsp::getRxBufferLength() {
 	return rxBufferLength;
 }
 
+*/
