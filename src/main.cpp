@@ -14,9 +14,8 @@ int main() {
     auto bus = I2C::I2C<0x03>();
     auto twi = TWI::TWI<twiSpeed>();
 
-    std::array<uint8_t, 2> writeOp = {0x28, 0x30};
     while (true) {
-        twi.write<writeOp.size()>(0x28, writeOp);
+        auto returns = twi.read<30>(0x28);
         hwlib::wait_ms(500);
     }
 
