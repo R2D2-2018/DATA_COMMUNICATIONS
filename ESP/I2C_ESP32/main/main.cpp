@@ -70,7 +70,7 @@ static void masterAndSlave(void * taskID) {
         } else {
 			std::cout << esp_err_to_name(ret) << ": Master read slave error, IO not connected...\n";
         }
-        ///< ---------------------------------------------------
+		
         int size = 0;
 		
 		std::cout << "MODIFY_RX +1\n";
@@ -129,7 +129,7 @@ static void master(void * taskID) {
         } else {
 			std::cout << "Task [" << task_idx << "] " << esp_err_to_name(ret) << ": Master write slave error, IO not connected...\n";
         }
-        ///< ---------------------------------------------------
+
 		ret = master.read();
         
         if(ret == ESP_ERR_TIMEOUT) {
@@ -173,7 +173,6 @@ static void slave(void * taskID) {
 			std::cout << "Task[" << task_idx << "] slave read: [" << size << "] bytes:\n";
             slave.printBuffer(slave.getDataBuffer(), size);
 		}
-        ///< ---------------------------------------------------
 		
 		std::cout << "MODIFYING DATA...\n";
 		slave.modifyData();
@@ -193,7 +192,10 @@ static void slave(void * taskID) {
 }
 
 void app_main() {
+	///< masterAndSlave demo code -- uncomment to activate
     xTaskCreate(masterAndSlave, "masterAndSlave", 1024 * 2, (void* ) 1, 10, NULL);
-    //xTaskCreate(master, "master", 1024 * 2, (void* ) 1, 10, NULL);
-    //xTaskCreate(slave, "slave", 1024 * 2, (void* ) 1, 10, NULL);
+	
+	///< master - slave demo code -- uncomment to activate
+    ///< xTaskCreate(master, "master", 1024 * 2, (void* ) 1, 10, NULL);
+    ///< xTaskCreate(slave, "slave", 1024 * 2, (void* ) 1, 10, NULL);
 }
