@@ -100,17 +100,17 @@ void I2cEsp::printBuffer(uint8_t* buffer, int len) {
 
 void I2cEsp::modifyData() {
 	for(int i = 0; i < rwBufferLength; ++i) {
-	dataBuffer[i] += 1;
+		dataBuffer[i] += 1;
 	}
 }
 void I2cEsp::modifyRx() {
 	for(int i = 0; i < rwBufferLength; ++i) {
-	rxBuffer[i] += 1;
+		rxBuffer[i] += 1;
 	}
 }
 void I2cEsp::modifyTx() {
 	for(int i = 0; i < rwBufferLength; ++i) {
-	txBuffer[i] += 1;
+		txBuffer[i] += 1;
 	}
 }
 
