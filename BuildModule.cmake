@@ -1,11 +1,15 @@
 include (${build_environment}/flags.cmake)
 
-#JULIAN'S MAGIC // BUILD
-set (sources
-     ${sources}
-     src/main.cpp
-	 src/wrap-hwlib.cpp
-	)
+set (sources ${sources}
+    src/main.cpp
+    src/wrap-hwlib.cpp
+    src/libc-stub.cpp
+    src/I2C.hpp
+)
+
+add_definitions (-DBMPTK_TARGET_arduino_due
+                 -DBMPTK_TARGET=arduino_due
+                 -DBMPTK_BAUDRATE=19200)
 
 set (cxxflags
     "-Os"
