@@ -1,7 +1,7 @@
 #ifndef MASTERSLAVESETTINGS_HPP
 #define MASTERSLAVESETTINGS_HPP
 
-//#include "MasterSlaveSettings.hpp"
+#include <iostream>
 
 class MasterSlaveSettings {
   private:
@@ -10,6 +10,8 @@ class MasterSlaveSettings {
     MasterSlaveSettings();
 
     static void masterAndSlave(void *taskID);
+
+    static void getDefaultArray(uint8_t data[], int dataLength);
 
     static void master(void *taskID);
 

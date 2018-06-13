@@ -8,6 +8,7 @@ MasterSlaveSettings::MasterSlaveSettings(){};
 ///< 2. Master reads data from slave		--> [1,2,3]
 ///< 2. Master writes data to slave			--> [7,7,7]
 ///< 3. Master reads data from slave		--> [7,7,7]
+
 void MasterSlaveSettings::masterAndSlave(void *taskID) {
     i2c_port_t slavePortNum = i2c_port_t::I2C_NUM_0;   ///< Slave port number
     gpio_num_t slaveSDA     = gpio_num_t::GPIO_NUM_25; ///< GPIO number for slave dataBuffer
@@ -20,37 +21,24 @@ void MasterSlaveSettings::masterAndSlave(void *taskID) {
     I2cEsp slave(slaveSDA, slaveSCL, slavePortNum);
     I2cEsp master(masterSDA, masterSCL, masterPortNum, true);
 
-    int i = 0;
     int ret;
     uint32_t task_idx = (uint32_t)taskID;
 
     int dataLength = 64;
 
     uint8_t data[dataLength];
+    getDefaultArray(data, dataLength);
 
     int count = 0;
 
-    for (i = 0; i < dataLength; i++) {
-        data[i] = i;
-    }
-    size_t d_size = slave.write(data);
-
-    if (d_size == 0) {
-        std::cout << "slave transmission buffer is FULL!\n";
-        ret = master.read();
-    } else {
-        ret = master.read();
-    }
-
-    std::cout << "TASK[" << task_idx << "] Slave buffer data:\n";
-    slave.printBuffer(slave.getDataBuffer(), d_size);
+    slave.write(data);
 
     while (1) {
         std::cout << "==================\n";
         std::cout << "test count: " << count++ << "\n";
         std::cout << "==================\n";
 
-        d_size = slave.write(slave.getDataBuffer());
+        size_t d_size = slave.write(slave.getDataBuffer());
 
         if (d_size == 0) {
             std::cout << "slave transmission buffer is FULL!\n";
@@ -89,6 +77,13 @@ void MasterSlaveSettings::masterAndSlave(void *taskID) {
                       << ": Master write slave error, IO not connected...\n";
         }
         vTaskDelay((delayTimeBetweenItemsMS * (task_idx + 1)) / portTICK_RATE_MS);
+    }
+}
+
+void MasterSlaveSettings::getDefaultArray(uint8_t *data, int dataLength) {
+
+    for (int i = 0; i < dataLength; i++) {
+        data[i] = i;
     }
 }
 
