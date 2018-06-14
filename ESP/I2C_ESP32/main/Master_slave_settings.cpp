@@ -1,5 +1,4 @@
 #include "Master_slave_settings.hpp"
-#include "I2C_ESP.hpp"
 
 MasterSlaveSettings::MasterSlaveSettings(){};
 
@@ -10,23 +9,33 @@ MasterSlaveSettings::MasterSlaveSettings(){};
 ///< 3. Master reads data from slave		--> [7,7,7]
 
 void MasterSlaveSettings::masterAndSlave(void *taskID) {
+
+    // I2cEsp slave;
+    // I2cEsp master;
+    // setPinsSlave(&slave);
+    // setPinsMaster(&master);
+
+    /*i2c_port_t masterPortNum = i2c_port_t::I2C_NUM_1;   ///< Master port number
+    gpio_num_t masterSDA     = gpio_num_t::GPIO_NUM_18; ///< GPIO number for master dataBuffer
+    gpio_num_t masterSCL     = gpio_num_t::GPIO_NUM_19; ///< GPIO number for master CLK
+
+    I2cEsp master(masterSDA, masterSCL, masterPortNum, true);
+
     i2c_port_t slavePortNum = i2c_port_t::I2C_NUM_0;   ///< Slave port number
     gpio_num_t slaveSDA     = gpio_num_t::GPIO_NUM_25; ///< GPIO number for slave dataBuffer
     gpio_num_t slaveSCL     = gpio_num_t::GPIO_NUM_26; ///< GPIO number for slave CLK
 
-    i2c_port_t masterPortNum = i2c_port_t::I2C_NUM_1;   ///< Master port number
-    gpio_num_t masterSDA     = gpio_num_t::GPIO_NUM_18; ///< GPIO number for master dataBuffer
-    gpio_num_t masterSCL     = gpio_num_t::GPIO_NUM_19; ///< GPIO number for master CLK
+    I2cEsp slave(slaveSDA, slaveSCL, slavePortNum);*/
 
-    I2cEsp slave(slaveSDA, slaveSCL, slavePortNum);
-    I2cEsp master(masterSDA, masterSCL, masterPortNum, true);
+    I2cEsp master(true);
+    I2cEsp slave;
 
     int ret;
     uint32_t task_idx = (uint32_t)taskID;
 
     int dataLength = 64;
-
     uint8_t data[dataLength];
+
     getDefaultArray(data, dataLength);
 
     int count = 0;
@@ -81,18 +90,22 @@ void MasterSlaveSettings::masterAndSlave(void *taskID) {
 }
 
 void MasterSlaveSettings::getDefaultArray(uint8_t *data, int dataLength) {
-
     for (int i = 0; i < dataLength; i++) {
         data[i] = i;
     }
 }
 
 void MasterSlaveSettings::master(void *taskID) {
-    i2c_port_t masterPortNum = i2c_port_t::I2C_NUM_1;   ///< Master port number
+    // I2cEsp master1;
+    // setPinsMaster(&master1);
+
+    /*i2c_port_t masterPortNum = i2c_port_t::I2C_NUM_1;   ///< Master port number
     gpio_num_t masterSDA     = gpio_num_t::GPIO_NUM_18; ///< GPIO number for master dataBuffer
     gpio_num_t masterSCL     = gpio_num_t::GPIO_NUM_19; ///< GPIO number for master CLK
 
-    I2cEsp master(masterSDA, masterSCL, masterPortNum, true);
+    I2cEsp master(masterSDA, masterSCL, masterPortNum, true);*/
+
+    I2cEsp master(true);
 
     int ret;
     uint32_t task_idx = (uint32_t)taskID;
@@ -139,12 +152,16 @@ void MasterSlaveSettings::master(void *taskID) {
 }
 
 void MasterSlaveSettings::slave(void *taskID) {
+    // I2cEsp slave1;
+    // setPinsSlave(&slave1);
 
-    i2c_port_t slavePortNum = i2c_port_t::I2C_NUM_0;   ///< Slave port number
+    /*i2c_port_t slavePortNum = i2c_port_t::I2C_NUM_0;   ///< Slave port number
     gpio_num_t slaveSDA     = gpio_num_t::GPIO_NUM_25; ///< GPIO number for slave dataBuffer
     gpio_num_t slaveSCL     = gpio_num_t::GPIO_NUM_26; ///< GPIO number for slave CLK
 
-    I2cEsp slave(slaveSDA, slaveSCL, slavePortNum);
+    I2cEsp slave(slaveSDA, slaveSCL, slavePortNum);*/
+
+    I2cEsp slave;
 
     uint32_t task_idx = (uint32_t)taskID;
 
@@ -183,3 +200,16 @@ void MasterSlaveSettings::slave(void *taskID) {
         vTaskDelay((delayTimeBetweenItemsMS * (task_idx + 1)) / portTICK_RATE_MS);
     }
 }
+
+/*void MasterSlaveSettings::setPinsMaster(I2cEsp *master) {
+
+    *master = I2cEsp(masterSDA, masterSCL, masterPortNum, true);
+}
+
+void MasterSlaveSettings::setPinsSlave(I2cEsp *slave) {
+    i2c_port_t slavePortNum = i2c_port_t::I2C_NUM_0;   ///< Slave port number
+    gpio_num_t slaveSDA     = gpio_num_t::GPIO_NUM_25; ///< GPIO number for slave dataBuffer
+    gpio_num_t slaveSCL     = gpio_num_t::GPIO_NUM_26; ///< GPIO number for slave CLK
+
+    *slave = I2cEsp(slaveSDA, slaveSCL, slavePortNum);
+}*/
