@@ -13,14 +13,6 @@
 
 class I2cEsp {
   private:
-    static constexpr i2c_port_t masterPortNum = i2c_port_t::I2C_NUM_1;   ///< Master port number
-    static constexpr gpio_num_t masterSDA     = gpio_num_t::GPIO_NUM_18; ///< GPIO number for master dataBuffer
-    static constexpr gpio_num_t masterSCL     = gpio_num_t::GPIO_NUM_19; ///< GPIO number for master CLK
-
-    static constexpr i2c_port_t slavePortNum = i2c_port_t::I2C_NUM_0;   ///< Slave port number
-    static constexpr gpio_num_t slaveSDA     = gpio_num_t::GPIO_NUM_25; ///< GPIO number for slave dataBuffer
-    static constexpr gpio_num_t slaveSCL     = gpio_num_t::GPIO_NUM_26; ///< GPIO number for slave CLK
-
     ///< ACK CONFIGURATION
     static constexpr bool checkAck             = true;                           ///< Whether master will check from ACKs from slave
     static constexpr i2c_ack_type_t masterAck  = i2c_ack_type_t::I2C_MASTER_ACK; ///< Master ACK value
@@ -61,7 +53,7 @@ class I2cEsp {
      * @param[in]     i2c_port_t	&portNum   I2C port number; i2c_port_t::I2C_NUM_0 by default
      * @param[in]     bool isMaster    Whether device is master; false by default
      */
-    I2cEsp(bool isMaster = false);
+    I2cEsp(const gpio_num_t &sda, const gpio_num_t &scl, const i2c_port_t &portNum = i2c_port_t::I2C_NUM_0, bool isMaster = false);
     ~I2cEsp();
 
     /**
