@@ -13,11 +13,11 @@ class MasterSlaveSettings {
 
     static void masterAndSlave(void *taskID);
 
-    static void getDefaultArray(uint8_t data[], int dataLength);
-
     static void master(void *taskID);
 
     static void slave(void *taskID);
+
+    static void getDefaultArray(uint8_t *data, int dataLength);
 };
 
 #endif

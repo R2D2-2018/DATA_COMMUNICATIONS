@@ -7,7 +7,6 @@ MasterSlaveSettings::MasterSlaveSettings(){};
 ///< 2. Master reads data from slave		--> [1,2,3]
 ///< 2. Master writes data to slave			--> [7,7,7]
 ///< 3. Master reads data from slave		--> [7,7,7]
-
 void MasterSlaveSettings::masterAndSlave(void *taskID) {
 
     // I2cEsp slave;
@@ -15,7 +14,7 @@ void MasterSlaveSettings::masterAndSlave(void *taskID) {
     // setPinsSlave(&slave);
     // setPinsMaster(&master);
 
-    /*i2c_port_t masterPortNum = i2c_port_t::I2C_NUM_1;   ///< Master port number
+    i2c_port_t masterPortNum = i2c_port_t::I2C_NUM_1;   ///< Master port number
     gpio_num_t masterSDA     = gpio_num_t::GPIO_NUM_18; ///< GPIO number for master dataBuffer
     gpio_num_t masterSCL     = gpio_num_t::GPIO_NUM_19; ///< GPIO number for master CLK
 
@@ -25,11 +24,9 @@ void MasterSlaveSettings::masterAndSlave(void *taskID) {
     gpio_num_t slaveSDA     = gpio_num_t::GPIO_NUM_25; ///< GPIO number for slave dataBuffer
     gpio_num_t slaveSCL     = gpio_num_t::GPIO_NUM_26; ///< GPIO number for slave CLK
 
-    I2cEsp slave(slaveSDA, slaveSCL, slavePortNum);*/
+    I2cEsp slave(slaveSDA, slaveSCL, slavePortNum);
 
-    I2cEsp master(true);
-    I2cEsp slave;
-
+    int i = 0;
     int ret;
     uint32_t task_idx = (uint32_t)taskID;
 
@@ -40,14 +37,27 @@ void MasterSlaveSettings::masterAndSlave(void *taskID) {
 
     int count = 0;
 
-    slave.write(data);
+    for (i = 0; i < dataLength; i++) {
+        data[i] = i;
+    }
+    size_t d_size = slave.write(data);
+
+    if (d_size == 0) {
+        std::cout << "slave transmission buffer is FULL!\n";
+        ret = master.read();
+    } else {
+        ret = master.read();
+    }
+
+    std::cout << "TASK[" << task_idx << "] Slave buffer data:\n";
+    slave.printBuffer(slave.getDataBuffer(), d_size);
 
     while (1) {
         std::cout << "==================\n";
         std::cout << "test count: " << count++ << "\n";
         std::cout << "==================\n";
 
-        size_t d_size = slave.write(slave.getDataBuffer());
+        d_size = slave.write(slave.getDataBuffer());
 
         if (d_size == 0) {
             std::cout << "slave transmission buffer is FULL!\n";
@@ -90,16 +100,11 @@ void MasterSlaveSettings::masterAndSlave(void *taskID) {
 }
 
 void MasterSlaveSettings::master(void *taskID) {
-    // I2cEsp master1;
-    // setPinsMaster(&master1);
-
-    /*i2c_port_t masterPortNum = i2c_port_t::I2C_NUM_1;   ///< Master port number
+    i2c_port_t masterPortNum = i2c_port_t::I2C_NUM_1;   ///< Master port number
     gpio_num_t masterSDA     = gpio_num_t::GPIO_NUM_18; ///< GPIO number for master dataBuffer
     gpio_num_t masterSCL     = gpio_num_t::GPIO_NUM_19; ///< GPIO number for master CLK
 
-    I2cEsp master(masterSDA, masterSCL, masterPortNum, true);*/
-
-    I2cEsp master(true);
+    I2cEsp master(masterSDA, masterSCL, masterPortNum, true);
 
     int ret;
     uint32_t task_idx = (uint32_t)taskID;
@@ -146,16 +151,11 @@ void MasterSlaveSettings::master(void *taskID) {
 }
 
 void MasterSlaveSettings::slave(void *taskID) {
-    // I2cEsp slave1;
-    // setPinsSlave(&slave1);
-
-    /*i2c_port_t slavePortNum = i2c_port_t::I2C_NUM_0;   ///< Slave port number
+    i2c_port_t slavePortNum = i2c_port_t::I2C_NUM_0;   ///< Slave port number
     gpio_num_t slaveSDA     = gpio_num_t::GPIO_NUM_25; ///< GPIO number for slave dataBuffer
     gpio_num_t slaveSCL     = gpio_num_t::GPIO_NUM_26; ///< GPIO number for slave CLK
 
-    I2cEsp slave(slaveSDA, slaveSCL, slavePortNum);*/
-
-    I2cEsp slave;
+    I2cEsp slave(slaveSDA, slaveSCL, slavePortNum);
 
     uint32_t task_idx = (uint32_t)taskID;
 
