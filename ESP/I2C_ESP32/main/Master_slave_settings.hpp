@@ -18,9 +18,6 @@ class MasterSlaveSettings {
     static void master(void *taskID);
 
     static void slave(void *taskID);
-
-    // static void setPinsSlave(I2cEsp *slave);
-    // static void setPinsMaster(I2cEsp *master);
 };
 
 #endif

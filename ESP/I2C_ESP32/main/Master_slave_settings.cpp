@@ -89,12 +89,6 @@ void MasterSlaveSettings::masterAndSlave(void *taskID) {
     }
 }
 
-void MasterSlaveSettings::getDefaultArray(uint8_t *data, int dataLength) {
-    for (int i = 0; i < dataLength; i++) {
-        data[i] = i;
-    }
-}
-
 void MasterSlaveSettings::master(void *taskID) {
     // I2cEsp master1;
     // setPinsMaster(&master1);
@@ -201,15 +195,8 @@ void MasterSlaveSettings::slave(void *taskID) {
     }
 }
 
-/*void MasterSlaveSettings::setPinsMaster(I2cEsp *master) {
-
-    *master = I2cEsp(masterSDA, masterSCL, masterPortNum, true);
+void MasterSlaveSettings::getDefaultArray(uint8_t *data, int dataLength) {
+    for (int i = 0; i < dataLength; i++) {
+        data[i] = i;
+    }
 }
-
-void MasterSlaveSettings::setPinsSlave(I2cEsp *slave) {
-    i2c_port_t slavePortNum = i2c_port_t::I2C_NUM_0;   ///< Slave port number
-    gpio_num_t slaveSDA     = gpio_num_t::GPIO_NUM_25; ///< GPIO number for slave dataBuffer
-    gpio_num_t slaveSCL     = gpio_num_t::GPIO_NUM_26; ///< GPIO number for slave CLK
-
-    *slave = I2cEsp(slaveSDA, slaveSCL, slavePortNum);
-}*/
