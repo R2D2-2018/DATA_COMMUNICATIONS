@@ -25,7 +25,7 @@ class AccesBuffers {
      * @return
      * buffer : uin8_t *
      */
-    static uint8_t *getMasterSlaveBuffer(void *taskID); // These function if currently empty
+    static uint8_t *getMasterSlaveBuffer(void *taskID); // This function is currently empty
     /**
      * @brief prints the master and slave buffer with error messages
      *
@@ -43,7 +43,7 @@ class AccesBuffers {
      * @return
      * buffer : uin8_t *
      */
-    static uint8_t *getMasterSlaveBuffer(void *taskID); // These function if currently empty
+    static uint8_t *getMasterSlaveBuffer(void *taskID); // This function is currently empty
     /**
      * @brief prints the slave buffer with error messages
      *
@@ -61,7 +61,7 @@ class AccesBuffers {
      * @return
      * buffer : uin8_t *
      */
-    static uint8_t *getSlaveBuffer(void *taskID); // These function if currently empty
+    static uint8_t *getSlaveBuffer(void *taskID); // This function is currently empty
 
     /**
      * @brief prints the master buffer with error messages
@@ -72,7 +72,7 @@ class AccesBuffers {
      */
     static void printSlaveBuffer(void *taskID);
 
-    static uint8_t *getDefaultArray(uint8_t *data, int dataLength); // These function if currently empty
+    static uint8_t *getDefaultArray(uint8_t *data, int dataLength); // This function is currently empty
 };
 
 #endif
