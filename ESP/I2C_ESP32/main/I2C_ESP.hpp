@@ -54,6 +54,8 @@ class I2cEsp {
      * @param[in]     bool isMaster    Whether device is master; false by default
      */
     I2cEsp(const gpio_num_t &sda, const gpio_num_t &scl, const i2c_port_t &portNum = i2c_port_t::I2C_NUM_0, bool isMaster = false);
+
+    I2cEsp(bool isMaster = false);
     ~I2cEsp();
 
     /**
