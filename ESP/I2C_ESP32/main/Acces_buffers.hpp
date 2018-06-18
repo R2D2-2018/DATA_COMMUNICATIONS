@@ -1,7 +1,7 @@
 #ifndef ACCESBUFFERS_HPP
 #define ACCESBUFFERS_HPP
 
-#include "I2C_ESP.hpp"
+#include "I2C_ESP_to_ESP.hpp"
 #include <iostream>
 
 /**
@@ -43,7 +43,7 @@ class AccesBuffers {
      * @return
      * buffer : uin8_t *
      */
-    static uint8_t *getMasterSlaveBuffer(void *taskID); // This function is currently empty
+    static uint8_t *getMasterBuffer(void *taskID); // This function is currently empty
     /**
      * @brief prints the slave buffer with error messages
      *
@@ -72,7 +72,20 @@ class AccesBuffers {
      */
     static void printSlaveBuffer(void *taskID);
 
-    static uint8_t *getDefaultArray(uint8_t *data, int dataLength); // This function is currently empty
+    /**
+     * @brief fills a buffer with standard values
+     *
+     * @description This function takes a buffer and fills it with values 0 to dataLength. The reason this
+     * function is made is to make sure the buffer is cleared before it's filled again.
+     *
+     * @parm
+     * data : uint8_t* //The data buffer
+     * dataLength : int
+     *
+     * @return
+     * data : uint8_t*
+     */
+    static uint8_t *getDefaultArray(uint8_t *data, int dataLength);
 };
 
 #endif

@@ -1,4 +1,4 @@
-#include "I2C_ESP.hpp"
+#include "I2C_ESP_to_ESP.hpp"
 
 I2cEsp::I2cEsp(const gpio_num_t &sda, const gpio_num_t &scl, const i2c_port_t &portNum, bool isMaster)
     : sda(sda), scl(scl), portNum(portNum), isMaster(isMaster) {
