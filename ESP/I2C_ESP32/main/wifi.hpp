@@ -10,6 +10,24 @@
 #ifndef ESPNOW_EXAMPLE_H
 #define ESPNOW_EXAMPLE_H
 
+#include "esp_event_loop.h"
+#include "esp_log.h"
+#include "esp_now.h"
+#include "esp_system.h"
+#include "esp_wifi.h"
+//#include "espnow_example.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/semphr.h"
+#include "freertos/timers.h"
+#include "nvs_flash.h"
+#include "rom/crc.h"
+#include "rom/ets_sys.h"
+#include "tcpip_adapter.h"
+#include <assert.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+
 /* ESPNOW can work in both station and softap mode. It is configured in menuconfig. */
 #if CONFIG_STATION_MODE
 #define ESPNOW_WIFI_MODE WIFI_MODE_STA
@@ -78,5 +96,29 @@ typedef struct {
     uint8_t *buffer;                    // Buffer pointing to ESPNOW data.
     uint8_t dest_mac[ESP_NOW_ETH_ALEN]; // MAC address of destination device.
 } example_espnow_send_param_t;
+
+class Wifi {
+
+  public:
+    Wifi();
+
+    static esp_err_t example_event_handler(void *ctx, system_event_t *event);
+
+    static void example_wifi_init(void);
+
+    static void example_espnow_send_cb(const uint8_t *mac_addr, esp_now_send_status_t status);
+
+    static void example_espnow_recv_cb(const uint8_t *mac_addr, const uint8_t *data, int len);
+
+    int example_espnow_data_parse(uint8_t *data, uint16_t data_len, uint8_t *state, uint16_t *seq, int *magic);
+
+    void example_espnow_data_prepare(example_espnow_send_param_t *send_param);
+
+    static void example_espnow_task(void *pvParameter);
+
+    static esp_err_t example_espnow_init(void);
+
+    static void example_espnow_deinit(example_espnow_send_param_t *send_param);
+};
 
 #endif

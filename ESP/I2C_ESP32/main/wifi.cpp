@@ -7,28 +7,13 @@
    CONDITIONS OF ANY KIND, either express or implied.
 */
 
+#include "wifi.hpp"
+
 /*
    This example shows how to use ESPNOW.
    Prepare two device, one for sending ESPNOW data and another for receiving
    ESPNOW data.
 */
-#include "esp_event_loop.h"
-#include "esp_log.h"
-#include "esp_now.h"
-#include "esp_system.h"
-#include "esp_wifi.h"
-#include "espnow_example.h"
-#include "freertos/FreeRTOS.h"
-#include "freertos/semphr.h"
-#include "freertos/timers.h"
-#include "nvs_flash.h"
-#include "rom/crc.h"
-#include "rom/ets_sys.h"
-#include "tcpip_adapter.h"
-#include <assert.h>
-#include <stdlib.h>
-#include <string.h>
-#include <time.h>
 
 static const char *TAG = "espnow_example";
 
@@ -37,9 +22,11 @@ static xQueueHandle example_espnow_queue;
 static uint8_t example_broadcast_mac[ESP_NOW_ETH_ALEN]        = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
 static uint16_t s_example_espnow_seq[EXAMPLE_ESPNOW_DATA_MAX] = {0, 0};
 
-static void example_espnow_deinit(example_espnow_send_param_t *send_param);
+Wifi::Wifi(){};
 
-static esp_err_t example_event_handler(void *ctx, system_event_t *event) {
+void example_espnow_deinit(example_espnow_send_param_t *send_param);
+
+esp_err_t example_event_handler(void *ctx, system_event_t *event) {
     switch (event->event_id) {
     case SYSTEM_EVENT_STA_START:
         ESP_LOGI(TAG, "WiFi started");
@@ -51,7 +38,7 @@ static esp_err_t example_event_handler(void *ctx, system_event_t *event) {
 }
 
 /* WiFi should start before using ESPNOW */
-static void example_wifi_init(void) {
+void Wifi::example_wifi_init(void) {
     tcpip_adapter_init();
     ESP_ERROR_CHECK(esp_event_loop_init(example_event_handler, NULL));
     wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
@@ -64,13 +51,13 @@ static void example_wifi_init(void) {
      * This is not necessary in real application if the two devices have
      * been already on the same channel.
      */
-    ESP_ERROR_CHECK(esp_wifi_set_channel(CONFIG_ESPNOW_CHANNEL, 0));
+    ESP_ERROR_CHECK(esp_wifi_set_channel(CONFIG_ESPNOW_CHANNEL, wifi_second_chan_t::WIFI_SECOND_CHAN_NONE));
 }
 
 /* ESPNOW sending or receiving callback function is called in WiFi task.
  * Users should not do lengthy operations from this task. Instead, post
  * necessary data to a queue and handle it from a lower priority task. */
-static void example_espnow_send_cb(const uint8_t *mac_addr, esp_now_send_status_t status) {
+void Wifi::example_espnow_send_cb(const uint8_t *mac_addr, esp_now_send_status_t status) {
     example_espnow_event_t evt;
     example_espnow_event_send_cb_t *send_cb = &evt.info.send_cb;
 
@@ -87,7 +74,7 @@ static void example_espnow_send_cb(const uint8_t *mac_addr, esp_now_send_status_
     }
 }
 
-static void example_espnow_recv_cb(const uint8_t *mac_addr, const uint8_t *data, int len) {
+void Wifi::example_espnow_recv_cb(const uint8_t *mac_addr, const uint8_t *data, int len) {
     example_espnow_event_t evt;
     example_espnow_event_recv_cb_t *recv_cb = &evt.info.recv_cb;
 
@@ -112,7 +99,7 @@ static void example_espnow_recv_cb(const uint8_t *mac_addr, const uint8_t *data,
 }
 
 /* Parse received ESPNOW data. */
-int example_espnow_data_parse(uint8_t *data, uint16_t data_len, uint8_t *state, uint16_t *seq, int *magic) {
+int Wifi::example_espnow_data_parse(uint8_t *data, uint16_t data_len, uint8_t *state, uint16_t *seq, int *magic) {
     example_espnow_data_t *buf = (example_espnow_data_t *)data;
     uint16_t crc, crc_cal = 0;
 
@@ -136,7 +123,7 @@ int example_espnow_data_parse(uint8_t *data, uint16_t data_len, uint8_t *state, 
 }
 
 /* Prepare ESPNOW data to be sent. */
-void example_espnow_data_prepare(example_espnow_send_param_t *send_param) {
+void Wifi::example_espnow_data_prepare(example_espnow_send_param_t *send_param) {
     example_espnow_data_t *buf = (example_espnow_data_t *)send_param->buffer;
     int i                      = 0;
 
@@ -153,7 +140,7 @@ void example_espnow_data_prepare(example_espnow_send_param_t *send_param) {
     buf->crc = crc16_le(UINT16_MAX, (uint8_t const *)buf, send_param->len);
 }
 
-static void example_espnow_task(void *pvParameter) {
+void Wifi::example_espnow_task(void *pvParameter) {
     example_espnow_event_t evt;
     uint8_t recv_state = 0;
     uint16_t recv_seq  = 0;
@@ -288,7 +275,7 @@ static void example_espnow_task(void *pvParameter) {
     }
 }
 
-static esp_err_t example_espnow_init(void) {
+esp_err_t Wifi::example_espnow_init(void) {
     example_espnow_send_param_t *send_param;
 
     example_espnow_queue = xQueueCreate(ESPNOW_QUEUE_SIZE, sizeof(example_espnow_event_t));
@@ -353,22 +340,9 @@ static esp_err_t example_espnow_init(void) {
     return ESP_OK;
 }
 
-static void example_espnow_deinit(example_espnow_send_param_t *send_param) {
+void Wifi::example_espnow_deinit(example_espnow_send_param_t *send_param) {
     free(send_param->buffer);
     free(send_param);
     vSemaphoreDelete(example_espnow_queue);
     esp_now_deinit();
-}
-
-void app_main() {
-    // Initialize NVS
-    esp_err_t ret = nvs_flash_init();
-    if (ret == ESP_ERR_NVS_NO_FREE_PAGES) {
-        ESP_ERROR_CHECK(nvs_flash_erase());
-        ret = nvs_flash_init();
-    }
-    ESP_ERROR_CHECK(ret);
-
-    example_wifi_init();
-    example_espnow_init();
 }
