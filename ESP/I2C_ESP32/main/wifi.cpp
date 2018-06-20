@@ -22,23 +22,8 @@ static xQueueHandle example_espnow_queue;
 static uint8_t example_broadcast_mac[ESP_NOW_ETH_ALEN]        = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
 static uint16_t s_example_espnow_seq[EXAMPLE_ESPNOW_DATA_MAX] = {0, 0};
 
-Wifi::Wifi(){};
-
-void example_espnow_deinit(example_espnow_send_param_t *send_param);
-
-esp_err_t example_event_handler(void *ctx, system_event_t *event) {
-    switch (event->event_id) {
-    case SYSTEM_EVENT_STA_START:
-        ESP_LOGI(TAG, "WiFi started");
-        break;
-    default:
-        break;
-    }
-    return ESP_OK;
-}
-
 /* WiFi should start before using ESPNOW */
-void Wifi::example_wifi_init(void) {
+Wifi::Wifi() {
     tcpip_adapter_init();
     ESP_ERROR_CHECK(esp_event_loop_init(example_event_handler, NULL));
     wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
@@ -52,6 +37,17 @@ void Wifi::example_wifi_init(void) {
      * been already on the same channel.
      */
     ESP_ERROR_CHECK(esp_wifi_set_channel(CONFIG_ESPNOW_CHANNEL, wifi_second_chan_t::WIFI_SECOND_CHAN_NONE));
+}
+
+esp_err_t Wifi::example_event_handler(void *ctx, system_event_t *event) {
+    switch (event->event_id) {
+    case SYSTEM_EVENT_STA_START:
+        ESP_LOGI(TAG, "WiFi started");
+        break;
+    default:
+        break;
+    }
+    return ESP_OK;
 }
 
 /* ESPNOW sending or receiving callback function is called in WiFi task.
@@ -85,7 +81,7 @@ void Wifi::example_espnow_recv_cb(const uint8_t *mac_addr, const uint8_t *data, 
 
     evt.id = EXAMPLE_ESPNOW_RECV_CB;
     memcpy(recv_cb->mac_addr, mac_addr, ESP_NOW_ETH_ALEN);
-    recv_cb->data = malloc(len);
+    recv_cb->data = new uint8_t(len);
     if (recv_cb->data == NULL) {
         ESP_LOGE(TAG, "Malloc receive data fail");
         return;
@@ -94,7 +90,7 @@ void Wifi::example_espnow_recv_cb(const uint8_t *mac_addr, const uint8_t *data, 
     recv_cb->data_len = len;
     if (xQueueSend(example_espnow_queue, &evt, portMAX_DELAY) != pdTRUE) {
         ESP_LOGW(TAG, "Send receive queue fail");
-        free(recv_cb->data);
+        delete recv_cb->data;
     }
 }
 
@@ -202,14 +198,15 @@ void Wifi::example_espnow_task(void *pvParameter) {
             example_espnow_event_recv_cb_t *recv_cb = &evt.info.recv_cb;
 
             ret = example_espnow_data_parse(recv_cb->data, recv_cb->data_len, &recv_state, &recv_seq, &recv_magic);
-            free(recv_cb->data);
+            delete recv_cb->data;
             if (ret == EXAMPLE_ESPNOW_DATA_BROADCAST) {
                 ESP_LOGI(TAG, "Receive %dth broadcast data from: " MACSTR ", len: %d", recv_seq, MAC2STR(recv_cb->mac_addr),
                          recv_cb->data_len);
 
                 /* If MAC address does not exist in peer list, add it to peer list. */
                 if (esp_now_is_peer_exist(recv_cb->mac_addr) == false) {
-                    esp_now_peer_info_t *peer = malloc(sizeof(esp_now_peer_info_t));
+                    esp_now_peer_info_t *peer = new esp_now_peer_info_t[sizeof(esp_now_peer_info_t)];
+
                     if (peer == NULL) {
                         ESP_LOGE(TAG, "Malloc peer information fail");
                         example_espnow_deinit(send_param);
@@ -222,7 +219,7 @@ void Wifi::example_espnow_task(void *pvParameter) {
                     memcpy(peer->lmk, CONFIG_ESPNOW_LMK, ESP_NOW_KEY_LEN);
                     memcpy(peer->peer_addr, recv_cb->mac_addr, ESP_NOW_ETH_ALEN);
                     ESP_ERROR_CHECK(esp_now_add_peer(peer));
-                    free(peer);
+                    delete[] peer;
                 }
 
                 /* Indicates that the device has received broadcast ESPNOW data. */
@@ -293,7 +290,8 @@ esp_err_t Wifi::example_espnow_init(void) {
     ESP_ERROR_CHECK(esp_now_set_pmk((uint8_t *)CONFIG_ESPNOW_PMK));
 
     /* Add broadcast peer information to peer list. */
-    esp_now_peer_info_t *peer = malloc(sizeof(esp_now_peer_info_t));
+    esp_now_peer_info_t *peer = new esp_now_peer_info_t[sizeof(esp_now_peer_info_t)];
+
     if (peer == NULL) {
         ESP_LOGE(TAG, "Malloc peer information fail");
         vSemaphoreDelete(example_espnow_queue);
@@ -306,10 +304,12 @@ esp_err_t Wifi::example_espnow_init(void) {
     peer->encrypt = false;
     memcpy(peer->peer_addr, example_broadcast_mac, ESP_NOW_ETH_ALEN);
     ESP_ERROR_CHECK(esp_now_add_peer(peer));
-    free(peer);
+
+    delete[] peer;
 
     /* Initialize sending parameters. */
-    send_param = malloc(sizeof(example_espnow_send_param_t));
+    send_param = new example_espnow_send_param_t[sizeof(example_espnow_send_param_t)];
+
     memset(send_param, 0, sizeof(example_espnow_send_param_t));
     if (send_param == NULL) {
         ESP_LOGE(TAG, "Malloc send parameter fail");
@@ -324,10 +324,10 @@ esp_err_t Wifi::example_espnow_init(void) {
     send_param->count     = CONFIG_ESPNOW_SEND_COUNT;
     send_param->delay     = CONFIG_ESPNOW_SEND_DELAY;
     send_param->len       = CONFIG_ESPNOW_SEND_LEN;
-    send_param->buffer    = malloc(CONFIG_ESPNOW_SEND_LEN);
+    send_param->buffer    = new uint8_t(CONFIG_ESPNOW_SEND_LEN);
     if (send_param->buffer == NULL) {
         ESP_LOGE(TAG, "Malloc send buffer fail");
-        free(send_param);
+        delete[] send_param;
         vSemaphoreDelete(example_espnow_queue);
         esp_now_deinit();
         return ESP_FAIL;
@@ -341,8 +341,8 @@ esp_err_t Wifi::example_espnow_init(void) {
 }
 
 void Wifi::example_espnow_deinit(example_espnow_send_param_t *send_param) {
-    free(send_param->buffer);
-    free(send_param);
+    delete send_param->buffer;
+    delete send_param;
     vSemaphoreDelete(example_espnow_queue);
     esp_now_deinit();
 }

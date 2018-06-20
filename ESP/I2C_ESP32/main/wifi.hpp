@@ -19,7 +19,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/semphr.h"
 #include "freertos/timers.h"
-#include "nvs_flash.h"
+// #include "nvs_flash.h"
 #include "rom/crc.h"
 #include "rom/ets_sys.h"
 #include "tcpip_adapter.h"
@@ -104,15 +104,15 @@ class Wifi {
 
     static esp_err_t example_event_handler(void *ctx, system_event_t *event);
 
-    static void example_wifi_init(void);
+    // static void example_wifi_init(void);
 
     static void example_espnow_send_cb(const uint8_t *mac_addr, esp_now_send_status_t status);
 
     static void example_espnow_recv_cb(const uint8_t *mac_addr, const uint8_t *data, int len);
 
-    int example_espnow_data_parse(uint8_t *data, uint16_t data_len, uint8_t *state, uint16_t *seq, int *magic);
+    static int example_espnow_data_parse(uint8_t *data, uint16_t data_len, uint8_t *state, uint16_t *seq, int *magic);
 
-    void example_espnow_data_prepare(example_espnow_send_param_t *send_param);
+    static void example_espnow_data_prepare(example_espnow_send_param_t *send_param);
 
     static void example_espnow_task(void *pvParameter);
 
