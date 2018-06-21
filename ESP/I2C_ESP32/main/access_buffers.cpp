@@ -1,21 +1,19 @@
-#include "Acces_buffers.hpp"
+#include "access_buffers.hpp"
 
-AccesBuffers::AccesBuffers(){};
+AccessBuffers::AccessBuffers(){};
 
 ///< Tasks which performs tests					Example:
 ///< 1. Slave buffer is filled with data	--> [1,2,3]
 ///< 2. Master reads data from slave		--> [1,2,3]
 ///< 2. Master writes data to slave			--> [7,7,7]
 ///< 3. Master reads data from slave		--> [7,7,7]
-void AccesBuffers::printMasterSlaveBuffer(void *taskID) {
+void AccessBuffers::printMasterSlaveBuffer(void *taskID) {
 
-    /*i2c_port_t masterPortNum = i2c_port_t::I2C_NUM_1;   ///< Master port number
+    i2c_port_t masterPortNum = i2c_port_t::I2C_NUM_1;   ///< Master port number
     gpio_num_t masterSDA     = gpio_num_t::GPIO_NUM_18; ///< GPIO number for master dataBuffer
-    gpio_num_t masterSCL     = gpio_num_t::GPIO_NUM_19; ///< GPIO number for master CLK*/
+    gpio_num_t masterSCL     = gpio_num_t::GPIO_NUM_19; ///< GPIO number for master CLK
 
-    I2cEsp master(gpio_num_t::GPIO_NUM_18, gpio_num_t::GPIO_NUM_19, i2c_port_t::I2C_NUM_1, true);
-
-    I2cEsp master(true);
+    I2cEsp master(masterSDA, masterSCL, masterPortNum, true);
 
     i2c_port_t slavePortNum = i2c_port_t::I2C_NUM_0;   ///< Slave port number
     gpio_num_t slaveSDA     = gpio_num_t::GPIO_NUM_25; ///< GPIO number for slave dataBuffer
@@ -32,8 +30,6 @@ void AccesBuffers::printMasterSlaveBuffer(void *taskID) {
 
     getDefaultArray(data, dataLength);
 
-    int count = 0;
-
     for (i = 0; i < dataLength; i++) {
         data[i] = i;
     }
@@ -45,6 +41,7 @@ void AccesBuffers::printMasterSlaveBuffer(void *taskID) {
     ret = master.read();
 
     slave.printBuffer(slave.getDataBuffer(), d_size);
+
     d_size = slave.write(slave.getDataBuffer());
 
     if (d_size == 0) {
@@ -82,7 +79,7 @@ void AccesBuffers::printMasterSlaveBuffer(void *taskID) {
     vTaskDelay((delayTimeBetweenItemsMS * (task_idx + 1)) / portTICK_RATE_MS);
 }
 
-void AccesBuffers::printMasterBuffer(void *taskID) {
+void AccessBuffers::printMasterBuffer(void *taskID) {
     i2c_port_t masterPortNum = i2c_port_t::I2C_NUM_1;   ///< Master port number
     gpio_num_t masterSDA     = gpio_num_t::GPIO_NUM_18; ///< GPIO number for master dataBuffer
     gpio_num_t masterSCL     = gpio_num_t::GPIO_NUM_19; ///< GPIO number for master CLK
@@ -124,7 +121,7 @@ void AccesBuffers::printMasterBuffer(void *taskID) {
     vTaskDelay((delayTimeBetweenItemsMS * (task_idx + 1)) / portTICK_RATE_MS);
 }
 
-void AccesBuffers::printSlaveBuffer(void *taskID) {
+void AccessBuffers::printSlaveBuffer(void *taskID) {
     i2c_port_t slavePortNum = i2c_port_t::I2C_NUM_0;   ///< Slave port number
     gpio_num_t slaveSDA     = gpio_num_t::GPIO_NUM_25; ///< GPIO number for slave dataBuffer
     gpio_num_t slaveSCL     = gpio_num_t::GPIO_NUM_26; ///< GPIO number for slave CLK
@@ -161,9 +158,8 @@ void AccesBuffers::printSlaveBuffer(void *taskID) {
 
     vTaskDelay((delayTimeBetweenItemsMS * (task_idx + 1)) / portTICK_RATE_MS);
 }
-}
 
-void AccesBuffers::getDefaultArray(uint8_t *data, int dataLength) {
+void AccessBuffers::getDefaultArray(uint8_t *data, int dataLength) {
     for (int i = 0; i < dataLength; i++) {
         data[i] = i;
     }

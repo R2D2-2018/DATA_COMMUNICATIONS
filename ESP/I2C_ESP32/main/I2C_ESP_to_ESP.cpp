@@ -1,4 +1,4 @@
-#include "I2C_ESP_to_ESP.hpp"
+#include "i2c_esp_to_esp.hpp"
 
 I2cEsp::I2cEsp(const gpio_num_t &sda, const gpio_num_t &scl, const i2c_port_t &portNum, bool isMaster)
     : sda(sda), scl(scl), portNum(portNum), isMaster(isMaster) {
@@ -27,43 +27,6 @@ I2cEsp::I2cEsp(const gpio_num_t &sda, const gpio_num_t &scl, const i2c_port_t &p
 
     i2c_param_config(portNum, &config);
     i2c_driver_install(portNum, config.mode, rxBufferLength, txBufferLength, 0);
-}
-
-I2cEsp::I2cEsp(bool isMaster) : isMaster(isMaster) {
-
-    i2c_config_t config;
-
-    if (isMaster) {
-        std::cout << "ja\n";
-        config.sda_io_num    = gpio_num_t::GPIO_NUM_18;
-        config.sda_pullup_en = GPIO_PULLUP_ENABLE;
-        config.scl_io_num    = gpio_num_t::GPIO_NUM_19;
-        config.scl_pullup_en = GPIO_PULLUP_ENABLE;
-
-        txBufferLength = 0; ///< Master transmission buffer size
-        rxBufferLength = 0; ///< Master receiving buffer size
-
-        config.mode             = I2C_MODE_MASTER;
-        config.master.clk_speed = masterClockFrequency;
-
-        i2c_param_config(i2c_port_t::I2C_NUM_1, &config);
-        i2c_driver_install(i2c_port_t::I2C_NUM_1, config.mode, rxBufferLength, txBufferLength, 0);
-    } else {
-        config.sda_io_num    = gpio_num_t::GPIO_NUM_25;
-        config.sda_pullup_en = GPIO_PULLUP_ENABLE;
-        config.scl_io_num    = gpio_num_t::GPIO_NUM_26;
-        config.scl_pullup_en = GPIO_PULLUP_ENABLE;
-
-        txBufferLength = 2 * dataLength; ///< Slave transmission buffer size
-        rxBufferLength = 2 * dataLength; ///< Slave receiving buffer size
-
-        config.mode                = I2C_MODE_SLAVE;
-        config.slave.addr_10bit_en = 0;
-        config.slave.slave_addr    = slaveAddress;
-
-        i2c_param_config(i2c_port_t::I2C_NUM_0, &config);
-        i2c_driver_install(i2c_port_t::I2C_NUM_0, config.mode, rxBufferLength, txBufferLength, 0);
-    }
 }
 
 I2cEsp::~I2cEsp() {

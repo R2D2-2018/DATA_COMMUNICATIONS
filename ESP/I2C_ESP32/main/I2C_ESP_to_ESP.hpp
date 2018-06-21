@@ -5,8 +5,8 @@
  * @license   MIT
  */
 
-#ifndef I2C_ESP_HPP
-#define I2C_ESP_HPP
+#ifndef I2C_ESP_TO_ESP_HPP
+#define I2C_ESP_TO_ESP_HPP
 
 #include "driver/i2c.h"
 #include <iostream>
@@ -54,8 +54,6 @@ class I2cEsp {
      * @param[in]     bool isMaster    Whether device is master; false by default
      */
     I2cEsp(const gpio_num_t &sda, const gpio_num_t &scl, const i2c_port_t &portNum = i2c_port_t::I2C_NUM_0, bool isMaster = false);
-
-    I2cEsp(bool isMaster = false);
     ~I2cEsp();
 
     /**
@@ -153,4 +151,4 @@ class I2cEsp {
     int getRwBufferLength();
 };
 
-#endif ///< I2C_ESP_HPP
+#endif ///< I2C_ESP_TO_ESP_HPP

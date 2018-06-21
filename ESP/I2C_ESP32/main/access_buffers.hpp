@@ -1,5 +1,5 @@
-#ifndef ACCESBUFFERS_HPP
-#define ACCESBUFFERS_HPP
+#ifndef ACCESS_BUFFERS_HPP
+#define ACCESS_BUFFERS_HPP
 
 #include "I2C_ESP_to_ESP.hpp"
 #include <iostream>
@@ -10,12 +10,12 @@
  * @author    Kiet van Osnabrugge and Roxanne van der Pol
  * @license   MIT
  */
-class AccesBuffers {
+class AccessBuffers {
   private:
     static constexpr int delayTimeBetweenItemsMS = 1000; ///< Delay time between loop iterations
 
   public:
-    AccesBuffers();
+    AccessBuffers();
 
     /**
      * @brief returns the master and slave buffer
@@ -85,7 +85,7 @@ class AccesBuffers {
      * @return
      * data : uint8_t*
      */
-    static uint8_t *getDefaultArray(uint8_t *data, int dataLength);
+    static void getDefaultArray(uint8_t *data, int dataLength);
 };
 
-#endif
+#endif // ACCESS_BUFFERS_HPP
