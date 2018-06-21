@@ -13,5 +13,5 @@ void app_main() {
 
     ///< master - slave demo code -- uncomment to activate
     /// xTaskCreate(master, "master", 1024 * 2, (void *)1, 10, NULL);
-    xTaskCreate(accessBuffers.printSlaveBuffer, "slave", 1024 * 2, (void *)1, 10, NULL);
+    xTaskCreate(accessBuffers.masterPrintBuffer, "master", 1024 * 2, (void *)1, 10, NULL);
 }

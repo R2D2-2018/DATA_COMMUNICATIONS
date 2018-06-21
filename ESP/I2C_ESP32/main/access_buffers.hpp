@@ -17,6 +17,14 @@ class AccessBuffers {
   public:
     AccessBuffers();
 
+    static uint8_t * masterRead(void *taskID);
+    static void masterWrite(uint8_t *data, int dataLength, void *taskID);
+    static void masterPrintBuffer(void *taskID);
+
+    static uint8_t * slaveRead(void *taskID);
+    static void slaveWrite(uint8_t *data, int dataLength, void *taskID);
+    static void slavePrintBuffer(void *taskID);
+
     /**
      * @brief returns the master and slave buffer
      *
@@ -25,7 +33,8 @@ class AccessBuffers {
      * @return
      * buffer : uin8_t *
      */
-    static uint8_t *getMasterSlaveBuffer(void *taskID); // This function is currently empty
+    //static uint8_t *getMasterSlaveBuffer(void *taskID); // This function is currently empty
+    
     /**
      * @brief prints the master and slave buffer with error messages
      *
@@ -33,7 +42,7 @@ class AccessBuffers {
      * them parameters of the esp are checked. And some parameters give information about faulty useage and will give an error
      * print. There is no clear explanation of the error yet.
      */
-    static void printMasterSlaveBuffer(void *taskID);
+    //static void printMasterSlaveBuffer(void *taskID);
 
     /**
      * @brief returns the slave buffer
@@ -43,7 +52,7 @@ class AccessBuffers {
      * @return
      * buffer : uin8_t *
      */
-    static uint8_t *getMasterBuffer(void *taskID); // This function is currently empty
+    //static uint8_t *getMasterBuffer(void *taskID); // This function is currently empty
     /**
      * @brief prints the slave buffer with error messages
      *
@@ -51,7 +60,7 @@ class AccessBuffers {
      * the esp are checked. And some parameters give information about faulty useage and will give an error print. There is no clear
      * explanation of the error yet.
      */
-    static void printMasterBuffer(void *taskID);
+    //static void printMasterBuffer(void *taskID);
 
     /**
      * @brief returns the master buffer
@@ -61,7 +70,7 @@ class AccessBuffers {
      * @return
      * buffer : uin8_t *
      */
-    static uint8_t *getSlaveBuffer(void *taskID); // This function is currently empty
+    //static uint8_t *getSlaveBuffer(void *taskID); // This function is currently empty
 
     /**
      * @brief prints the master buffer with error messages
@@ -70,7 +79,7 @@ class AccessBuffers {
      * of the esp are checked. And some parameters give information about faulty useage and will give an error print. There is no
      * clear explanation of the error yet.
      */
-    static void printSlaveBuffer(void *taskID);
+    //static void printSlaveBuffer(void *taskID);
 
     /**
      * @brief fills a buffer with standard values
