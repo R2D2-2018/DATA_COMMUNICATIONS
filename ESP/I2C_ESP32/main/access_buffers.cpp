@@ -30,6 +30,8 @@ void AccessBuffers::printMasterSlaveBuffer(void *taskID) {
 
     getDefaultArray(data, dataLength);
 
+    int count = 0;
+
     for (i = 0; i < dataLength; i++) {
         data[i] = i;
     }
@@ -37,46 +39,59 @@ void AccessBuffers::printMasterSlaveBuffer(void *taskID) {
 
     if (d_size == 0) {
         std::cout << "slave transmission buffer is FULL!\n";
+        ret = master.read();
+    } else {
+        ret = master.read();
     }
-    ret = master.read();
 
+    std::cout << "TASK[" << task_idx << "] Slave buffer data:\n";
     slave.printBuffer(slave.getDataBuffer(), d_size);
 
-    d_size = slave.write(slave.getDataBuffer());
+    while (1) {
+        std::cout << "==================\n";
+        std::cout << "test count: " << count++ << "\n";
+        std::cout << "==================\n";
 
-    if (d_size == 0) {
-        std::cout << "slave transmission buffer is FULL!\n";
+        d_size = slave.write(slave.getDataBuffer());
+
+        if (d_size == 0) {
+            std::cout << "slave transmission buffer is FULL!\n";
+            ret = master.read();
+        } else {
+            ret = master.read();
+        }
+
+        if (ret == ESP_ERR_TIMEOUT) {
+            std::cout << "I2C TIME_OUT\n";
+        } else if (ret == ESP_OK) {
+            std::cout << "TASK[" << task_idx << "] master read:\n";
+            master.printBuffer(master.getRxBuffer(), d_size);
+        } else {
+            std::cout << esp_err_to_name(ret) << ": Master read slave error, IO not connected...\n";
+        }
+
+        int size = 0;
+
+        std::cout << "MODIFY_RX +1\n";
+        master.modifyRx();
+
+        ret = master.write(master.getRxBuffer(), master.getRwBufferLength());
+        if (ret == ESP_OK) {
+            size = slave.read();
+        }
+        if (ret == ESP_ERR_TIMEOUT) {
+            std::cout << "I2C TIME_OUT\n";
+        } else if (ret == ESP_OK) {
+            std::cout << "Task[" << task_idx << "] master write:\n";
+            master.printBuffer(master.getTxBuffer(), master.getRwBufferLength());
+            std::cout << "Task[" << task_idx << "] slave read: [" << size << "] bytes:\n";
+            slave.printBuffer(slave.getDataBuffer(), size);
+        } else {
+            std::cout << "Task [" << task_idx << "] " << esp_err_to_name(ret)
+                      << ": Master write slave error, IO not connected...\n";
+        }
+        vTaskDelay((delayTimeBetweenItemsMS * (task_idx + 1)) / portTICK_RATE_MS);
     }
-    ret = master.read();
-
-    if (ret == ESP_ERR_TIMEOUT) {
-        std::cout << "I2C TIME_OUT\n";
-    } else if (ret == ESP_OK) {
-        std::cout << "TASK[" << task_idx << "] master read:\n";
-        master.printBuffer(master.getRxBuffer(), d_size);
-    } else {
-        std::cout << esp_err_to_name(ret) << ": Master read slave error, IO not connected...\n";
-    }
-
-    int size = 0;
-
-    master.modifyRx();
-
-    ret = master.write(master.getRxBuffer(), master.getRwBufferLength());
-    if (ret == ESP_OK) {
-        size = slave.read();
-    }
-    if (ret == ESP_ERR_TIMEOUT) {
-        std::cout << "I2C TIME_OUT\n";
-    } else if (ret == ESP_OK) {
-        std::cout << "Task[" << task_idx << "] master write:\n";
-        master.printBuffer(master.getTxBuffer(), master.getRwBufferLength());
-        std::cout << "Task[" << task_idx << "] slave read: [" << size << "] bytes:\n";
-        slave.printBuffer(slave.getDataBuffer(), size);
-    } else {
-        std::cout << "Task [" << task_idx << "] " << esp_err_to_name(ret) << ": Master write slave error, IO not connected...\n";
-    }
-    vTaskDelay((delayTimeBetweenItemsMS * (task_idx + 1)) / portTICK_RATE_MS);
 }
 
 void AccessBuffers::printMasterBuffer(void *taskID) {
@@ -96,29 +111,38 @@ void AccessBuffers::printMasterBuffer(void *taskID) {
         data[i] = i;
     }
 
-    ret = master.write(data, master.getRwBufferLength());
+    int count = 0;
 
-    if (ret == ESP_ERR_TIMEOUT) {
-        std::cout << "I2C TIME_OUT\n";
-    } else if (ret == ESP_OK) {
-        std::cout << "Task[" << task_idx << "] master write:\n";
-        master.printBuffer(master.getTxBuffer(), master.getRwBufferLength());
-    } else {
-        std::cout << "Task [" << task_idx << "] " << esp_err_to_name(ret) << ": Master write slave error, IO not connected...\n";
+    while (1) {
+        std::cout << "==================\n";
+        std::cout << "test count: " << count++ << "\n";
+        std::cout << "==================\n";
+
+        ret = master.write(data, master.getRwBufferLength());
+
+        if (ret == ESP_ERR_TIMEOUT) {
+            std::cout << "I2C TIME_OUT\n";
+        } else if (ret == ESP_OK) {
+            std::cout << "Task[" << task_idx << "] master write:\n";
+            master.printBuffer(master.getTxBuffer(), master.getRwBufferLength());
+        } else {
+            std::cout << "Task [" << task_idx << "] " << esp_err_to_name(ret)
+                      << ": Master write slave error, IO not connected...\n";
+        }
+
+        ret = master.read();
+
+        if (ret == ESP_ERR_TIMEOUT) {
+            std::cout << "I2C TIME_OUT\n";
+        } else if (ret == ESP_OK) {
+            std::cout << "TASK[" << task_idx << "] master read:\n";
+            master.printBuffer(master.getRxBuffer(), master.getRwBufferLength());
+        } else {
+            std::cout << esp_err_to_name(ret) << ": Master read slave error, IO not connected...\n";
+        }
+
+        vTaskDelay((delayTimeBetweenItemsMS * (task_idx + 1)) / portTICK_RATE_MS);
     }
-
-    ret = master.read();
-
-    if (ret == ESP_ERR_TIMEOUT) {
-        std::cout << "I2C TIME_OUT\n";
-    } else if (ret == ESP_OK) {
-        std::cout << "TASK[" << task_idx << "] master read:\n";
-        master.printBuffer(master.getRxBuffer(), master.getRwBufferLength());
-    } else {
-        std::cout << esp_err_to_name(ret) << ": Master read slave error, IO not connected...\n";
-    }
-
-    vTaskDelay((delayTimeBetweenItemsMS * (task_idx + 1)) / portTICK_RATE_MS);
 }
 
 void AccessBuffers::printSlaveBuffer(void *taskID) {
@@ -130,33 +154,40 @@ void AccessBuffers::printSlaveBuffer(void *taskID) {
 
     uint32_t task_idx = (uint32_t)taskID;
 
-    int size = 0;
+    int count = 0;
+    int size  = 0;
 
     size_t d_size = 0;
 
-    size = slave.read();
+    while (1) {
+        std::cout << "==================\n";
+        std::cout << "test count: " << count++ << "\n";
+        std::cout << "==================\n";
 
-    if (size == ESP_ERR_TIMEOUT) {
-        std::cout << "I2C TIME_OUT\n";
-    } else {
-        std::cout << "Task[" << task_idx << "] slave read: [" << size << "] bytes:\n";
-        slave.printBuffer(slave.getDataBuffer(), size);
+        size = slave.read();
+
+        if (size == ESP_ERR_TIMEOUT) {
+            std::cout << "I2C TIME_OUT\n";
+        } else {
+            std::cout << "Task[" << task_idx << "] slave read: [" << size << "] bytes:\n";
+            slave.printBuffer(slave.getDataBuffer(), size);
+        }
+
+        std::cout << "MODIFYING DATA...\n";
+        slave.modifyData();
+
+        d_size = slave.write(slave.getDataBuffer());
+
+        if (d_size == 0) {
+            std::cout << "slave transmission buffer is FULL!\n";
+        } else {
+
+            std::cout << "TASK[" << task_idx << "] Slave write:\n";
+            slave.printBuffer(slave.getDataBuffer(), d_size);
+        }
+
+        vTaskDelay((delayTimeBetweenItemsMS * (task_idx + 1)) / portTICK_RATE_MS);
     }
-
-    std::cout << "MODIFYING DATA...\n";
-    slave.modifyData();
-
-    d_size = slave.write(slave.getDataBuffer());
-
-    if (d_size == 0) {
-        std::cout << "slave transmission buffer is FULL!\n";
-    } else {
-
-        std::cout << "TASK[" << task_idx << "] Slave write:\n";
-        slave.printBuffer(slave.getDataBuffer(), d_size);
-    }
-
-    vTaskDelay((delayTimeBetweenItemsMS * (task_idx + 1)) / portTICK_RATE_MS);
 }
 
 void AccessBuffers::getDefaultArray(uint8_t *data, int dataLength) {
