@@ -17,84 +17,81 @@ class AccessBuffers {
   public:
     AccessBuffers();
 
+    /**
+ * @brief returns the master RX buffer
+ *
+ * @description This function uses the I2C_ESP_to_ESP class to read the resieve buffer and then returns the buffer
+ * in pointer form. If an error occors then then a default buffer will be returned.
+ * 
+ * @return 
+ * buffer : uint8_t*
+ */
     static uint8_t * masterRead(void *taskID);
-    static void masterWrite(uint8_t *data, int dataLength, void *taskID);
+
+        /**
+ * @brief set the TX master buffer
+ *
+ * @description This function uses the I2C_ESP_to_ESP class to set the transmition master buffer with the parameter buffer.
+ * If error from the esp-idf toolchain occor these erros will be printed.
+ * 
+ * @parm 
+ * buffer : uint8_t *
+ * bufferLength : int
+ */
+    static void masterWrite(uint8_t *buffer, int bufferLength, void *taskID);
+
+        /**
+ * @brief reads and prints the master buffer
+ *
+ * @description This function uses the I2C_ESP_to_ESP class to read the RX master buffer and prints it. 
+ * If error from the esp-idf toolchain occor these erros will be printed as well.
+ * 
+ */
     static void masterPrintBuffer(void *taskID);
 
+        /**
+ * @brief returns the slave RX buffer
+ *
+ * @description This function uses the I2C_ESP_to_ESP class to read the resieve slave buffer and then returns the buffer
+ * in pointer form. If an error occors then then a default buffer will be returned.
+ * 
+ * @return 
+ * buffer : uint8_t*
+ */
     static uint8_t * slaveRead(void *taskID);
-    static void slaveWrite(uint8_t *data, int dataLength, void *taskID);
+
+  /**
+ * @brief set the TX slave buffer
+ *
+ * @description This function uses the I2C_ESP_to_ESP class to set the transmition slave buffer with the parameter buffer.
+ * If error from the esp-idf toolchain occor these erros will be printed.
+ * 
+ * @parm 
+ * buffer : uint8_t *
+ * bufferLength : int
+ */
+    static void slaveWrite(uint8_t *buffer, int bufferLength, void *taskID);
+
+        /**
+ * @brief reads and prints the RX slave buffer
+ *
+ * @description This function uses the I2C_ESP_to_ESP class to read the resieve slave buffer and prints it. 
+ * If error from the esp-idf toolchain occor these erros will be printed as well.
+ * 
+ */
     static void slavePrintBuffer(void *taskID);
-
-    /**
-     * @brief returns the master and slave buffer
-     *
-     * @description
-     *
-     * @return
-     * buffer : uin8_t *
-     */
-    //static uint8_t *getMasterSlaveBuffer(void *taskID); // This function is currently empty
-    
-    /**
-     * @brief prints the master and slave buffer with error messages
-     *
-     * @description This function prints the master and the slave buffer. During the process of filling the buffers and printing
-     * them parameters of the esp are checked. And some parameters give information about faulty useage and will give an error
-     * print. There is no clear explanation of the error yet.
-     */
-    //static void printMasterSlaveBuffer(void *taskID);
-
-    /**
-     * @brief returns the slave buffer
-     *
-     * @description
-     *
-     * @return
-     * buffer : uin8_t *
-     */
-    //static uint8_t *getMasterBuffer(void *taskID); // This function is currently empty
-    /**
-     * @brief prints the slave buffer with error messages
-     *
-     * @description This function prints the slave buffer. During the process of filling the buffers and printing them parameters of
-     * the esp are checked. And some parameters give information about faulty useage and will give an error print. There is no clear
-     * explanation of the error yet.
-     */
-    //static void printMasterBuffer(void *taskID);
-
-    /**
-     * @brief returns the master buffer
-     *
-     * @description
-     *
-     * @return
-     * buffer : uin8_t *
-     */
-    //static uint8_t *getSlaveBuffer(void *taskID); // This function is currently empty
-
-    /**
-     * @brief prints the master buffer with error messages
-     *
-     * @description This function prints the master buffer. During the process of filling the buffers and printing them parameters
-     * of the esp are checked. And some parameters give information about faulty useage and will give an error print. There is no
-     * clear explanation of the error yet.
-     */
-    //static void printSlaveBuffer(void *taskID);
 
     /**
      * @brief fills a buffer with standard values
      *
-     * @description This function takes a buffer and fills it with values 0 to dataLength. The reason this
+     * @description This function takes a buffer and fills it with values 0 to bufferLength. The reason this
      * function is made is to make sure the buffer is cleared before it's filled again.
      *
      * @parm
-     * data : uint8_t* //The data buffer
-     * dataLength : int
-     *
-     * @return
-     * data : uint8_t*
+     * buffer : uint8_t* //The buffer buffer
+     * bufferLength : int
      */
-    static void getDefaultArray(uint8_t *data, int dataLength);
+    static void getDefaultArray(uint8_t *buffer, int bufferLength);
 };
 
 #endif // ACCESS_BUFFERS_HPP
