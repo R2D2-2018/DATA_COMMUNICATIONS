@@ -29,7 +29,7 @@ uint8_t * AccessBuffers::masterRead(void *taskID){
     }
 };
 
-void AccessBuffers::masterWrite(uint8_t *buffer, int bufferLength, void *taskID){
+bool AccessBuffers::masterWrite(uint8_t *buffer, int bufferLength){
     i2c_port_t masterPortNum = i2c_port_t::I2C_NUM_1;   ///< Master port number
     gpio_num_t masterSDA     = gpio_num_t::GPIO_NUM_18; ///< GPIO number for master dataBuffer
     gpio_num_t masterSCL     = gpio_num_t::GPIO_NUM_19; ///< GPIO number for master CLK
@@ -37,26 +37,23 @@ void AccessBuffers::masterWrite(uint8_t *buffer, int bufferLength, void *taskID)
     I2cEsp master(masterSDA, masterSCL, masterPortNum, true);
 
     int ret;
-    uint32_t task_idx = (uint32_t)taskID;
     int x = master.getRwBufferLength();
 
     if (bufferLength > x){
-        std::cout<<"Size of parameter buffer to big\n";
-        return;
+        //if size of parameter buffer to big
+        return 0;
     }
-    
-    while (1) {
 
-        ret = master.write(buffer, bufferLength);
+    ret = master.write(buffer, bufferLength);
 
-        if (ret == ESP_ERR_TIMEOUT) {
-            std::cout << "I2C TIME_OUT\n";
-        } else if (ret != ESP_OK) {
-            std::cout << "Task [" << task_idx << "] " << esp_err_to_name(ret)
-                      << ": Master write slave error, IO not connected...\n";
-        } 
-        vTaskDelay((delayTimeBetweenItemsMS * (task_idx + 1)) / portTICK_RATE_MS);
-    }
+    if (ret == ESP_ERR_TIMEOUT) {
+        // if I2C TIME_OUT is returned form master.write()
+        return 0;
+    } else if (ret != ESP_OK) {
+        // io is probebly not connected
+        return 0;
+    } 
+    return 1;
 };
 
 void AccessBuffers::masterPrintBuffer(void *taskID){
@@ -91,55 +88,6 @@ void AccessBuffers::masterPrintBuffer(void *taskID){
     }
 };
 
-// void AccessBuffers::printMasterBuffer(void *taskID) {
-//     i2c_port_t masterPortNum = i2c_port_t::I2C_NUM_1;   ///< Master port number
-//     gpio_num_t masterSDA     = gpio_num_t::GPIO_NUM_18; ///< GPIO number for master dataBuffer
-//     gpio_num_t masterSCL     = gpio_num_t::GPIO_NUM_19; ///< GPIO number for master CLK
-
-//     I2cEsp master(masterSDA, masterSCL, masterPortNum, true);
-
-//     int ret;
-//     uint32_t task_idx = (uint32_t)taskID;
-
-//     int dataLength = 64;
-//     uint8_t data[dataLength];
-
-//     getDefaultArray(data, dataLength);
-
-//     int count = 0;
-
-//     while (1) {
-//         std::cout << "==================\n";
-//         std::cout << "test count: " << count++ << "\n";
-//         std::cout << "==================\n";
-
-//         ret = master.write(data, master.getRwBufferLength());
-
-//         if (ret == ESP_ERR_TIMEOUT) {
-//             std::cout << "I2C TIME_OUT\n";
-//         } else if (ret == ESP_OK) {
-//             std::cout << "Task[" << task_idx << "] master write:\n";
-//             master.printBuffer(master.getTxBuffer(), master.getRwBufferLength());
-//         } else {
-//             std::cout << "Task [" << task_idx << "] " << esp_err_to_name(ret)
-//                       << ": Master write slave error, IO not connected...\n";
-//         }
-
-//         ret = master.read();
-
-//         if (ret == ESP_ERR_TIMEOUT) {
-//             std::cout << "I2C TIME_OUT\n";
-//         } else if (ret == ESP_OK) {
-//             std::cout << "TASK[" << task_idx << "] master read:\n";
-//             master.printBuffer(master.getRxBuffer(), master.getRwBufferLength());
-//         } else {
-//             std::cout << esp_err_to_name(ret) << ": Master read slave error, IO not connected...\n";
-//         }
-
-//         vTaskDelay((delayTimeBetweenItemsMS * (task_idx + 1)) / portTICK_RATE_MS);
-//     }
-// }
-
 uint8_t * AccessBuffers::slaveRead(void *taskID){
     i2c_port_t slavePortNum = i2c_port_t::I2C_NUM_0;   ///< Slave port number
     gpio_num_t slaveSDA     = gpio_num_t::GPIO_NUM_25; ///< GPIO number for slave dataBuffer
@@ -164,35 +112,32 @@ uint8_t * AccessBuffers::slaveRead(void *taskID){
     vTaskDelay((delayTimeBetweenItemsMS * (task_idx + 1)) / portTICK_RATE_MS);
 }
 
-void AccessBuffers::slaveWrite(uint8_t *buffer, int bufferLength, void *taskID){
+bool AccessBuffers::slaveWrite(uint8_t *buffer, int bufferLength){
     i2c_port_t slavePortNum = i2c_port_t::I2C_NUM_0;   ///< Slave port number
     gpio_num_t slaveSDA     = gpio_num_t::GPIO_NUM_25; ///< GPIO number for slave dataBuffer
     gpio_num_t slaveSCL     = gpio_num_t::GPIO_NUM_26; ///< GPIO number for slave CLK
 
     I2cEsp slave(slaveSDA, slaveSCL, slavePortNum);
 
-    uint32_t task_idx = (uint32_t)taskID;
-
     size_t d_size = 0;
     int x = slave.getRwBufferLength();
 
     if (bufferLength > x){
-        std::cout<<"Size of parameter buffer to big\n";
-        return;
+        //if size of parameter buffer to big
+        return 0;
     }
 
     while (1) {
         d_size = slave.write(slave.getDataBuffer());
 
         if (d_size == 0) {
-            std::cout << "slave transmission buffer is FULL!\n";
+            //slave transmition buffer is full
+            return 0;
         } else {
             slave.write(buffer, bufferLength);
-            std::cout << "TASK[" << task_idx << "] Slave write:\n";
-            slave.printBuffer(slave.getDataBuffer(), bufferLength);
+            return 1;
         }
 
-        vTaskDelay((delayTimeBetweenItemsMS * (task_idx + 1)) / portTICK_RATE_MS);
     }
 }
 

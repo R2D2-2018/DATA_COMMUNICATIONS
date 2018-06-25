@@ -2,6 +2,7 @@
 #define ACCESS_BUFFERS_HPP
 
 #include "I2C_ESP_to_ESP.hpp"
+#include "esp_log.h"
 #include <iostream>
 
 /**
@@ -38,7 +39,7 @@ class AccessBuffers {
  * buffer : uint8_t *
  * bufferLength : int
  */
-    static void masterWrite(uint8_t *buffer, int bufferLength, void *taskID);
+    static bool masterWrite(uint8_t *buffer, int bufferLength);
 
         /**
  * @brief reads and prints the master buffer
@@ -70,7 +71,7 @@ class AccessBuffers {
  * buffer : uint8_t *
  * bufferLength : int
  */
-    static void slaveWrite(uint8_t *buffer, int bufferLength, void *taskID);
+    static bool slaveWrite(uint8_t *buffer, int bufferLength);
 
         /**
  * @brief reads and prints the RX slave buffer

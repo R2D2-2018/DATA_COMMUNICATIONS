@@ -1,12 +1,14 @@
-// #include "WIFI.hpp"
-// #include <iostream>
+#include "WIFI.hpp"
+#include <iostream>
 
-// WIFI::WIFI(){};
+WIFI::WIFI(){};
 
-// WIFI::read() {
-//     std::cout << "read via wifi\n";
-// };
+uint8_t * WIFI::readWifiBuffer() {
+    std::cout << "read via wifi\n";
+    uint8_t buffer[1] = {0};
+    return buffer;
+};
 
-// WIFI::write(uint8_t *txBuffer, size_t size) {
-//     std::cout << "write via wifi\n";
-// };
+void WIFI::writeWifiBuffer(uint8_t *txBuffer, size_t size) {
+    std::cout << "write via wifi\n";
+};
