@@ -21,7 +21,7 @@ class WIFI {
      * @description
      *
      * @return
-     * buffer uint8_t *
+     * buffer : uint8_t *
      */
     uint8_t * readWifiBuffer(); // This function if currently empty
 

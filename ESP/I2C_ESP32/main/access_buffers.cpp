@@ -8,7 +8,7 @@ AccessBuffers::AccessBuffers(){};
 ///< 2. Master writes data to slave			--> [7,7,7]
 ///< 3. Master reads data from slave		--> [7,7,7]
 
-uint8_t * AccessBuffers::masterRead(void *taskID){
+uint8_t *AccessBuffers::masterRead(void *taskID) {
     i2c_port_t masterPortNum = i2c_port_t::I2C_NUM_1;   ///< Master port number
     gpio_num_t masterSDA     = gpio_num_t::GPIO_NUM_18; ///< GPIO number for master dataBuffer
     gpio_num_t masterSCL     = gpio_num_t::GPIO_NUM_19; ///< GPIO number for master CLK
@@ -19,10 +19,10 @@ uint8_t * AccessBuffers::masterRead(void *taskID){
 
     ret = master.read();
 
-    if(ret == ESP_OK) {
+    if (ret == ESP_OK) {
         return master.getRxBuffer();
     } else {
-        int bufferLength = 64; //just an random size
+        int bufferLength = 64; // just an random size
         uint8_t buffer[bufferLength];
         getDefaultArray(buffer, bufferLength);
         return buffer;
@@ -56,7 +56,7 @@ bool AccessBuffers::masterWrite(uint8_t *buffer, int bufferLength){
     return 1;
 };
 
-void AccessBuffers::masterPrintBuffer(void *taskID){
+void AccessBuffers::masterPrintBuffer(void *taskID) { ///< This function is mostly used for debugging
     i2c_port_t masterPortNum = i2c_port_t::I2C_NUM_1;   ///< Master port number
     gpio_num_t masterSDA     = gpio_num_t::GPIO_NUM_18; ///< GPIO number for master dataBuffer
     gpio_num_t masterSCL     = gpio_num_t::GPIO_NUM_19; ///< GPIO number for master CLK
@@ -66,7 +66,7 @@ void AccessBuffers::masterPrintBuffer(void *taskID){
     int ret;
     uint32_t task_idx = (uint32_t)taskID;
 
-    int count = 0;  
+    int count = 0;
 
     while (1) {
         std::cout << "==================\n";
@@ -97,12 +97,12 @@ uint8_t * AccessBuffers::slaveRead(void *taskID){
 
     uint32_t task_idx = (uint32_t)taskID;
 
-    int size  = 0;
+    int size = 0;
 
     size = slave.read();
 
     if (size == ESP_ERR_TIMEOUT) {
-        int bufferLength = 64; //just an random size
+        int bufferLength = 64; // just an random size
         uint8_t buffer[bufferLength];
         getDefaultArray(buffer, bufferLength);
         return buffer;
@@ -120,7 +120,7 @@ bool AccessBuffers::slaveWrite(uint8_t *buffer, int bufferLength){
     I2cEsp slave(slaveSDA, slaveSCL, slavePortNum);
 
     size_t d_size = 0;
-    int x = slave.getRwBufferLength();
+    int x         = slave.getRwBufferLength();
 
     if (bufferLength > x){
         //if size of parameter buffer to big
@@ -141,7 +141,7 @@ bool AccessBuffers::slaveWrite(uint8_t *buffer, int bufferLength){
     }
 }
 
-void AccessBuffers::slavePrintBuffer(void *taskID){
+void AccessBuffers::slavePrintBuffer(void *taskID) { ///< This function is mostly used for debugging
     i2c_port_t slavePortNum = i2c_port_t::I2C_NUM_0;   ///< Slave port number
     gpio_num_t slaveSDA     = gpio_num_t::GPIO_NUM_25; ///< GPIO number for slave dataBuffer
     gpio_num_t slaveSCL     = gpio_num_t::GPIO_NUM_26; ///< GPIO number for slave CLK
