@@ -7,8 +7,8 @@
    CONDITIONS OF ANY KIND, either express or implied.
 */
 
-#ifndef ESPNOW_EXAMPLE_H
-#define ESPNOW_EXAMPLE_H
+#ifndef WIFI_HPP
+#define WIFI_HPP
 
 #include "esp_event_loop.h"
 #include "esp_log.h"
@@ -30,48 +30,48 @@
 
 /* ESPNOW can work in both station and softap mode. It is configured in menuconfig. */
 #if CONFIG_STATION_MODE
-#define ESPNOW_WIFI_MODE WIFI_MODE_STA
-#define ESPNOW_WIFI_IF ESP_IF_WIFI_STA
+#define WIFI_MODE WIFI_MODE_STA
+#define WIFI_IF ESP_IF_WIFI_STA
 #else
-#define ESPNOW_WIFI_MODE WIFI_MODE_AP
-#define ESPNOW_WIFI_IF ESP_IF_WIFI_AP
+#define WIFI_MODE WIFI_MODE_AP
+#define WIFI_IF ESP_IF_WIFI_AP
 #endif
 
-#define ESPNOW_QUEUE_SIZE 6
+#define QUEUE_SIZE 6
 
-#define IS_BROADCAST_ADDR(addr) (memcmp(addr, example_broadcast_mac, ESP_NOW_ETH_ALEN) == 0)
+#define IS_BROADCAST_ADDR(addr) (memcmp(addr, broadcast_mac, ESP_NOW_ETH_ALEN) == 0)
 
 typedef enum {
-    EXAMPLE_ESPNOW_SEND_CB,
-    EXAMPLE_ESPNOW_RECV_CB,
-} example_espnow_event_id_t;
+    SEND_CB,
+    RECV_CB,
+} event_id_t;
 
 typedef struct {
     uint8_t mac_addr[ESP_NOW_ETH_ALEN];
     esp_now_send_status_t status;
-} example_espnow_event_send_cb_t;
+} event_send_cb_t;
 
 typedef struct {
     uint8_t mac_addr[ESP_NOW_ETH_ALEN];
     uint8_t *data;
     int data_len;
-} example_espnow_event_recv_cb_t;
+} event_recv_cb_t;
 
 typedef union {
-    example_espnow_event_send_cb_t send_cb;
-    example_espnow_event_recv_cb_t recv_cb;
-} example_espnow_event_info_t;
+    event_send_cb_t send_cb;
+    event_recv_cb_t recv_cb;
+} event_info_t;
 
 /* When ESPNOW sending or receiving callback function is called, post event to ESPNOW task. */
 typedef struct {
-    example_espnow_event_id_t id;
-    example_espnow_event_info_t info;
-} example_espnow_event_t;
+    event_id_t id;
+    event_info_t info;
+} event_t;
 
 enum {
-    EXAMPLE_ESPNOW_DATA_BROADCAST,
-    EXAMPLE_ESPNOW_DATA_UNICAST,
-    EXAMPLE_ESPNOW_DATA_MAX,
+    DATA_BROADCAST,
+    DATA_UNICAST,
+    DATA_MAX,
 };
 
 /* User defined field of ESPNOW data in this example. */
@@ -82,7 +82,7 @@ typedef struct {
     uint16_t crc;       // CRC16 value of ESPNOW data.
     uint32_t magic;     // Magic number which is used to determine which device to send unicast ESPNOW data.
     uint8_t payload[0]; // Real payload of ESPNOW data.
-} __attribute__((packed)) example_espnow_data_t;
+} __attribute__((packed)) data_t;
 
 /* Parameters of sending ESPNOW data. */
 typedef struct {
@@ -95,30 +95,47 @@ typedef struct {
     int len;                            // Length of ESPNOW data to be sent, unit: byte.
     uint8_t *buffer;                    // Buffer pointing to ESPNOW data.
     uint8_t dest_mac[ESP_NOW_ETH_ALEN]; // MAC address of destination device.
-} example_espnow_send_param_t;
+} send_param_t;
 
 class Wifi {
 
   public:
     Wifi();
 
-    static esp_err_t example_event_handler(void *ctx, system_event_t *event);
+    /**
+     * @brief switches events
+     * 
+     * @description This function switches between events like wifi started.
+     *
+     * @parama
+     * event : system_event_t * // the even you want the change to.
+     * 
+     * @return 
+     * ESP_OK : esp_err_t
+     */
+    static esp_err_t event_handler(void *ctx, system_event_t *event);
 
-    // static void example_wifi_init(void);
+    /**
+     * @brief Short description of foo
+     *
+     * description of foo
+     * [BLANK]
+     * @param[in]     a    What is the input for the function
+     * @return What will the function return
+     */
+    static void send_cb(const uint8_t *mac_addr, esp_now_send_status_t status);
 
-    static void example_espnow_send_cb(const uint8_t *mac_addr, esp_now_send_status_t status);
+    static void recv_cb(const uint8_t *mac_addr, const uint8_t *data, int len);
 
-    static void example_espnow_recv_cb(const uint8_t *mac_addr, const uint8_t *data, int len);
+    static int data_parse(uint8_t *data, uint16_t data_len, uint8_t *state, uint16_t *seq, int *magic);
 
-    static int example_espnow_data_parse(uint8_t *data, uint16_t data_len, uint8_t *state, uint16_t *seq, int *magic);
+    static void data_prepare(send_param_t *send_param);
 
-    static void example_espnow_data_prepare(example_espnow_send_param_t *send_param);
+    static void task(void *pvParameter);
 
-    static void example_espnow_task(void *pvParameter);
+    static esp_err_t init(void);
 
-    static esp_err_t example_espnow_init(void);
-
-    static void example_espnow_deinit(example_espnow_send_param_t *send_param);
+    static void deinit(send_param_t *send_param);
 };
 
 #endif
