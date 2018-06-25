@@ -70,46 +70,45 @@ void Wifi::send_cb(const uint8_t *mac_addr, esp_now_send_status_t status) {
     }
 }
 
-void Wifi::recv_cb(const uint8_t *mac_addr, const uint8_t *data, int len) {
+void Wifi::recv_cb(const uint8_t *mac_addr, const uint8_t *data, int dataSize) {
     event_t evt;
     event_recv_cb_t *recv_cb = &evt.info.recv_cb;
 
-    if (mac_addr == NULL || data == NULL || len <= 0) {
+    if (mac_addr == NULL || data == NULL || dataSize <= 0) {
         ESP_LOGE(TAG, "Receive cb arg error");
         return;
     }
 
     evt.id = RECV_CB;
     memcpy(recv_cb->mac_addr, mac_addr, ESP_NOW_ETH_ALEN);
-    recv_cb->data = new uint8_t(len);
+    recv_cb->data = new uint8_t(dataSize);
     if (recv_cb->data == NULL) {
         ESP_LOGE(TAG, "Malloc receive data fail");
         return;
     }
-    memcpy(recv_cb->data, data, len);
-    recv_cb->data_len = len;
+    memcpy(recv_cb->data, data, dataSize);
+    recv_cb->data_len = dataSize;
     if (xQueueSend(queue, &evt, portMAX_DELAY) != pdTRUE) {
         ESP_LOGW(TAG, "Send receive queue fail");
         delete recv_cb->data;
     }
 }
 
-/* Parse received ESPNOW data. */
-int Wifi::data_parse(uint8_t *data, uint16_t data_len, uint8_t *state, uint16_t *seq, int *magic) {
+int Wifi::data_parse(uint8_t *data, uint16_t dataLen, uint8_t * state, uint16_t * seq, int * deviceNum) {
     data_t *buf = (data_t *)data;
     uint16_t crc, crc_cal = 0;
 
-    if (data_len < sizeof(data_t)) {
-        ESP_LOGE(TAG, "Receive wifi data too short, len:%d", data_len);
+    if (dataLen < sizeof(data_t)) {
+        ESP_LOGE(TAG, "Receive wifi data too short, len:%d", dataLen);
         return -1;
     }
 
     *state   = buf->state;
     *seq     = buf->seq_num;
-    *magic   = buf->magic;
+    *deviceNum   = buf->deviceNum;
     crc      = buf->crc;
     buf->crc = 0;
-    crc_cal  = crc16_le(UINT16_MAX, (uint8_t const *)buf, data_len);
+    crc_cal  = crc16_le(UINT16_MAX, (uint8_t const *)buf, dataLen);
 
     if (crc_cal == crc) {
         return buf->type;
@@ -118,7 +117,6 @@ int Wifi::data_parse(uint8_t *data, uint16_t data_len, uint8_t *state, uint16_t 
     return -1;
 }
 
-/* Prepare ESPNOW data to be sent. */
 void Wifi::data_prepare(send_param_t *send_param) {
     data_t *buf = (data_t *)send_param->buffer;
     int i                      = 0;
@@ -129,7 +127,7 @@ void Wifi::data_prepare(send_param_t *send_param) {
     buf->state   = send_param->state;
     buf->seq_num = s_seq[buf->type]++;
     buf->crc     = 0;
-    buf->magic   = send_param->magic;
+    buf->deviceNum   = send_param->deviceNum;
     for (i = 0; i < send_param->len - sizeof(data_t); i++) {
         buf->payload[i] = (uint8_t)esp_random();
     }
@@ -140,7 +138,7 @@ void Wifi::task(void *pvParameter) {
     event_t evt;
     uint8_t recv_state = 0;
     uint16_t recv_seq  = 0;
-    int recv_magic     = 0;
+    int recv_deviceNum    = 0;
     bool is_broadcast  = false;
     int ret;
 
@@ -197,7 +195,7 @@ void Wifi::task(void *pvParameter) {
         case RECV_CB: {
             event_recv_cb_t *recv_cb = &evt.info.recv_cb;
 
-            ret = data_parse(recv_cb->data, recv_cb->data_len, &recv_state, &recv_seq, &recv_magic);
+            ret = data_parse(recv_cb->data, recv_cb->data_len, &recv_state, &recv_seq, &recv_deviceNum);
             delete recv_cb->data;
             if (ret == DATA_BROADCAST) {
                 ESP_LOGI(TAG, "Receive %dth broadcast data from: " MACSTR ", len: %d", recv_seq, MAC2STR(recv_cb->mac_addr),
@@ -228,15 +226,15 @@ void Wifi::task(void *pvParameter) {
                 }
 
                 /* If receive broadcast ESPNOW data which indicates that the other
-                 * device has received broadcast ESPNOW data and the local magic number
+                 * device has received broadcast ESPNOW data and the local deviceNum number
                  * is bigger than that in the received broadcast ESPNOW data, stop
                  * sending broadcast ESPNOW data and start sending unicast ESPNOW data.
                  */
                 if (recv_state == 1) {
-                    /* The device which has the bigger magic number sends ESPNOW data, the
+                    /* The device which has the bigger deviceNum number sends ESPNOW data, the
                      * other one receives ESPNOW data.
                      */
-                    if (send_param->unicast == false && send_param->magic >= recv_magic) {
+                    if (send_param->unicast == false && send_param->deviceNum >= recv_deviceNum) {
                         ESP_LOGI(TAG, "Start sending unicast data");
                         ESP_LOGI(TAG, "send data to " MACSTR "", MAC2STR(recv_cb->mac_addr));
 
@@ -320,7 +318,7 @@ esp_err_t Wifi::init(void) {
     send_param->unicast   = false;
     send_param->broadcast = false;
     send_param->state     = 0;
-    send_param->magic     = esp_random();
+    send_param->deviceNum     = esp_random();
     send_param->count     = CONFIG_ESPNOW_SEND_COUNT;
     send_param->delay     = CONFIG_ESPNOW_SEND_DELAY;
     send_param->len       = CONFIG_ESPNOW_SEND_LEN;
