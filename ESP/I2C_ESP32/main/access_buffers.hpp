@@ -18,67 +18,67 @@ class AccessBuffers {
     AccessBuffers();
 
     /**
- * @brief returns the master RX buffer
- *
- * @description This function uses the I2C_ESP_to_ESP class to read the resieve buffer and then returns the buffer
- * in pointer form. If an error occors then then a default buffer will be returned.
- * 
- * @return 
- * buffer : uint8_t*
- */
-    static uint8_t * masterRead(void *taskID);
+     * @brief returns the master RX buffer
+     *
+     * @description This function uses the I2C_ESP_to_ESP class to read the resieve buffer and then returns the buffer
+     * in pointer form. If an error occors then then a default buffer will be returned.
+     *
+     * @return
+     * buffer : uint8_t*
+     */
+    static uint8_t *masterRead(void *taskID);
 
-        /**
- * @brief set the TX master buffer
- *
- * @description This function uses the I2C_ESP_to_ESP class to set the transmition master buffer with the parameter buffer.
- * If error from the esp-idf toolchain occor these erros will be printed.
- * 
- * @parm 
- * buffer : uint8_t *
- * bufferLength : int
- */
+    /**
+     * @brief set the TX master buffer
+     *
+     * @description This function uses the I2C_ESP_to_ESP class to set the transmition master buffer with the parameter buffer.
+     * If error from the esp-idf toolchain occor these erros will be printed.
+     *
+     * @parm
+     * buffer : uint8_t *
+     * bufferLength : int
+     */
     static void masterWrite(uint8_t *buffer, int bufferLength, void *taskID);
 
-        /**
- * @brief reads and prints the master buffer
- *
- * @description This function uses the I2C_ESP_to_ESP class to read the RX master buffer and prints it. 
- * If error from the esp-idf toolchain occor these erros will be printed as well.
- * 
- */
+    /**
+     * @brief reads and prints the master buffer
+     *
+     * @description This function uses the I2C_ESP_to_ESP class to read the RX master buffer and prints it.
+     * If error from the esp-idf toolchain occor these erros will be printed as well.
+     *
+     */
     static void masterPrintBuffer(void *taskID);
 
-        /**
- * @brief returns the slave RX buffer
- *
- * @description This function uses the I2C_ESP_to_ESP class to read the resieve slave buffer and then returns the buffer
- * in pointer form. If an error occors then then a default buffer will be returned.
- * 
- * @return 
- * buffer : uint8_t*
- */
-    static uint8_t * slaveRead(void *taskID);
+    /**
+     * @brief returns the slave RX buffer
+     *
+     * @description This function uses the I2C_ESP_to_ESP class to read the resieve slave buffer and then returns the buffer
+     * in pointer form. If an error occors then then a default buffer will be returned.
+     *
+     * @return
+     * buffer : uint8_t*
+     */
+    static uint8_t *slaveRead(void *taskID);
 
-  /**
- * @brief set the TX slave buffer
- *
- * @description This function uses the I2C_ESP_to_ESP class to set the transmition slave buffer with the parameter buffer.
- * If error from the esp-idf toolchain occor these erros will be printed.
- * 
- * @parm 
- * buffer : uint8_t *
- * bufferLength : int
- */
+    /**
+     * @brief set the TX slave buffer
+     *
+     * @description This function uses the I2C_ESP_to_ESP class to set the transmition slave buffer with the parameter buffer.
+     * If error from the esp-idf toolchain occor these erros will be printed.
+     *
+     * @parm
+     * buffer : uint8_t *
+     * bufferLength : int
+     */
     static void slaveWrite(uint8_t *buffer, int bufferLength, void *taskID);
 
-        /**
- * @brief reads and prints the RX slave buffer
- *
- * @description This function uses the I2C_ESP_to_ESP class to read the resieve slave buffer and prints it. 
- * If error from the esp-idf toolchain occor these erros will be printed as well.
- * 
- */
+    /**
+     * @brief reads and prints the RX slave buffer
+     *
+     * @description This function uses the I2C_ESP_to_ESP class to read the resieve slave buffer and prints it.
+     * If error from the esp-idf toolchain occor these erros will be printed as well.
+     *
+     */
     static void slavePrintBuffer(void *taskID);
 
     /**
