@@ -1,6 +1,6 @@
 #include "i2c_esp_to_esp.hpp"
 
-I2cEsp::I2cEsp(const gpio_num_t &sda, const gpio_num_t &scl, const i2c_port_t &portNum, bool isMaster)
+i2cEsp::i2cEsp(const gpio_num_t &sda, const gpio_num_t &scl, const i2c_port_t &portNum, bool isMaster)
     : sda(sda), scl(scl), portNum(portNum), isMaster(isMaster) {
 
     i2c_config_t config;
@@ -29,13 +29,13 @@ I2cEsp::I2cEsp(const gpio_num_t &sda, const gpio_num_t &scl, const i2c_port_t &p
     i2c_driver_install(portNum, config.mode, rxBufferLength, txBufferLength, 0);
 }
 
-I2cEsp::~I2cEsp() {
+i2cEsp::~i2cEsp() {
     delete dataBuffer;
     delete txBuffer;
     delete rxBuffer;
 }
 
-esp_err_t I2cEsp::read() {
+esp_err_t i2cEsp::read() {
     if (isMaster) {
         i2c_cmd_handle_t link = i2c_cmd_link_create();
         i2c_master_start(link);
@@ -55,7 +55,7 @@ esp_err_t I2cEsp::read() {
     }
 }
 
-esp_err_t I2cEsp::write(uint8_t *txBuffer, size_t size) {
+esp_err_t i2cEsp::write(uint8_t *txBuffer, size_t size) {
 
     if (isMaster) {
         for (int i = 0; i < size; ++i) {
@@ -80,7 +80,7 @@ esp_err_t I2cEsp::write(uint8_t *txBuffer, size_t size) {
     }
 }
 
-void I2cEsp::printBuffer(uint8_t *buffer, int len) {
+void i2cEsp::printBuffer(uint8_t *buffer, int len) {
     std::cout << std::hex;
     int i;
     for (i = 0; i < len; i++) {
@@ -93,32 +93,32 @@ void I2cEsp::printBuffer(uint8_t *buffer, int len) {
     std::cout << std::dec;
 }
 
-void I2cEsp::modifyData() {
+void i2cEsp::modifyData() {
     for (int i = 0; i < rwBufferLength; ++i) {
         dataBuffer[i] += 1;
     }
 }
-void I2cEsp::modifyRx() {
+void i2cEsp::modifyRx() {
     for (int i = 0; i < rwBufferLength; ++i) {
         rxBuffer[i] += 1;
     }
 }
-void I2cEsp::modifyTx() {
+void i2cEsp::modifyTx() {
     for (int i = 0; i < rwBufferLength; ++i) {
         txBuffer[i] += 1;
     }
 }
 
-uint8_t *I2cEsp::getDataBuffer() {
+uint8_t *i2cEsp::getDataBuffer() {
     return dataBuffer;
 }
-uint8_t *I2cEsp::getRxBuffer() {
+uint8_t *i2cEsp::getRxBuffer() {
     return rxBuffer;
 }
-uint8_t *I2cEsp::getTxBuffer() {
+uint8_t *i2cEsp::getTxBuffer() {
     return txBuffer;
 }
 
-int I2cEsp::getRwBufferLength() {
+int i2cEsp::getRwBufferLength() {
     return rwBufferLength;
 }
