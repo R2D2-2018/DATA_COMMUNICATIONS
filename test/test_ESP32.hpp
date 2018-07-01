@@ -2,4 +2,4 @@
 #include "esp32.hpp"
 #include <typeinfo>
 
-esp32 esp32;
+esp32 espTest;
