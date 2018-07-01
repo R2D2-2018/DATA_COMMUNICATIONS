@@ -2,7 +2,7 @@
 #define TWI_HPP
 
 /**
- * @file TWI.hpp
+ * @file twi.hpp
  * @brief Abstraction for the TWI (two-wire interface) interface
  * @author Niels de Waal
  * @license see LICENSE
@@ -12,10 +12,10 @@
 
 #include <array>
 
-namespace TWI {
+namespace twi {
 
 template <uint32_t SPEED>
-class TWI {
+class twi {
   private:
     static constexpr uint32_t masterClock = 84000000; ///< Master clock rate 84MHz
 
@@ -70,7 +70,7 @@ class TWI {
      *
      * Constructor for the TWI interface.
      */
-    TWI() {
+    twi() {
         auto config_pin = [](uint32_t pin) {
             PIOA->PIO_ABSR &= (~pin & PIOA->PIO_ABSR);
             PIOA->PIO_PDR  = pin;
@@ -184,6 +184,6 @@ class TWI {
     }
 };
 
-} // namespace TWI
+} // namespace twi
 
 #endif // TWI_HPP
