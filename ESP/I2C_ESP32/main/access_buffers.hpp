@@ -1,8 +1,8 @@
 #ifndef ACCESS_BUFFERS_HPP
 #define ACCESS_BUFFERS_HPP
 
-#include "I2C_ESP_to_ESP.hpp"
 #include "esp_log.h"
+#include "i2c_esp_to_esp.hpp"
 #include <iostream>
 
 /**
@@ -34,8 +34,8 @@ class AccessBuffers {
      *
      * @description This function uses the I2C_ESP_to_ESP class to set the transmition master buffer with the parameter buffer.
      * If error from the esp-idf toolchain occor the function will return 0.
-     * 
-     * @parm 
+     *
+     * @parm
      * buffer : uint8_t *
      * bufferLength : int
      */
@@ -67,8 +67,8 @@ class AccessBuffers {
      *
      * @description This function uses the I2C_ESP_to_ESP class to set the transmition slave buffer with the parameter buffer.
      * If error from the esp-idf toolchain occor the function will return 0.
-     * 
-     * @parm 
+     *
+     * @parm
      * buffer : uint8_t *
      * bufferLength : int
      */

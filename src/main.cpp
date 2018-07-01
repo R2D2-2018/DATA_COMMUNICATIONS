@@ -1,7 +1,7 @@
-#include "ESP32.hpp"
-#include "I2C.hpp"
-#include "TWI.hpp"
+#include "esp32.hpp"
+#include "i2c.hpp"
 #include "memory_map.hpp"
+#include "twi.hpp"
 #include "wrap-hwlib.hpp"
 
 #include <array>
