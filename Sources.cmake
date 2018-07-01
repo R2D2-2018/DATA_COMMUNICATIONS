@@ -11,7 +11,7 @@ include_directories (${catch}/single_include)
 # Source Files:
 
 set (sources
-    ./src/esp32.cpp
+    ./src/esp32.hpp
     ./src/memory_map.hpp
     ./src/i2c.hpp
     ./src/twi.hpp
