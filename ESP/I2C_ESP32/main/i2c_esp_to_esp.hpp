@@ -11,14 +11,14 @@
 #include "driver/i2c.h"
 #include <iostream>
 
-class I2cEsp {
+class i2cEsp {
   private:
-    ///< ACK CONFIGURATION
+    ///ACK CONFIGURATION
     static constexpr bool checkAck             = true;                           ///< Whether master will check from ACKs from slave
     static constexpr i2c_ack_type_t masterAck  = i2c_ack_type_t::I2C_MASTER_ACK; ///< Master ACK value
     static constexpr i2c_ack_type_t masterNack = i2c_ack_type_t::I2C_MASTER_NACK; ///< Master NACK value (false)
 
-    ///< SLAVE ADDRESS AND RW BIT CONFIGURATION
+    ///SLAVE ADDRESS AND RW BIT CONFIGURATION
     static constexpr uint8_t slaveAddress = 0x28;                       ///< ESP32 slave address
     static constexpr i2c_rw_t writeBit    = i2c_rw_t::I2C_MASTER_WRITE; ///< Master WRITE bit
     static constexpr i2c_rw_t readBit     = i2c_rw_t::I2C_MASTER_READ;  ///< Master READ bit
@@ -53,8 +53,8 @@ class I2cEsp {
      * @param[in]     i2c_port_t	&portNum   I2C port number; i2c_port_t::I2C_NUM_0 by default
      * @param[in]     bool isMaster    Whether device is master; false by default
      */
-    I2cEsp(const gpio_num_t &sda, const gpio_num_t &scl, const i2c_port_t &portNum = i2c_port_t::I2C_NUM_0, bool isMaster = false);
-    ~I2cEsp();
+    i2cEsp(const gpio_num_t &sda, const gpio_num_t &scl, const i2c_port_t &portNum = i2c_port_t::I2C_NUM_0, bool isMaster = false);
+    ~i2cEsp();
 
     /**
      * @brief Read output from connected device
