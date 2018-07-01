@@ -12,7 +12,7 @@ set (sources ${sources}
     ${unit_test_main}
     src/wrap-hwlib.cpp
     src/libc-stub.cpp
-    src/ESP32.hpp
+    src/esp32.hpp
     src/memory_map.hpp
 )
 
