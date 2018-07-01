@@ -12,10 +12,10 @@
 
 #include <array>
 
-namespace I2C {
+namespace i2c {
 
 template <uint8_t devAddress>
-class I2C {
+class i2c {
   private:
     static constexpr uint8_t deviceAddress = devAddress; ///< Address of the I2C device
   public:
@@ -24,7 +24,7 @@ class I2C {
      *
      * Constructor for the I2C class.
      */
-    I2C() {
+    i2c() {
     }
 
     /**
