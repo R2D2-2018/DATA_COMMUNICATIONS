@@ -2,9 +2,6 @@
 #include "../src/esp32.hpp"
 #include "../src/memory_map.hpp"
 
-// VERTICAL_SLICE_1
-#include "test_VS1-Dummy_OP_CODES.hpp"
-
 // VERTICAL_SLICE_2
 #include "test_VS2-EnumForRegisters.hpp"
 

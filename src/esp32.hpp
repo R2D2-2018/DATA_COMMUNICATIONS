@@ -5,8 +5,8 @@
  * @license   MIT
  */
 
-#ifndef esp32_HPP
-#define esp32_HPP
+#ifndef ESP32_HPP
+#define ESP32_HPP
 
 //#include "command.hpp"
 
