@@ -12,10 +12,10 @@
 
 #include <array>
 
-class esp32 {
+class Esp32 {
   private:
   public:
-    esp32();
+    Esp32();
 
     /**
      * @brief Resets the esp32 chip

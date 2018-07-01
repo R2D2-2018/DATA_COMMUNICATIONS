@@ -8,28 +8,28 @@
 
 #include "esp32.hpp"
 
-esp32::esp32() {
+Esp32::Esp32() {
 }
 
-void esp32::reset() {
+void Esp32::reset() {
 }
 
-int esp32::readRegister(int address) {
+int Esp32::readRegister(int address) {
     return address;
 }
 
-void esp32::writeRegister(int address, std::array<uint8_t, 2> data) {
+void Esp32::writeRegister(int address, std::array<uint8_t, 2> data) {
 }
 
-void esp32::setBit() {
+void Esp32::setBit() {
 }
 
-void esp32::eraseBit() {
+void Esp32::eraseBit() {
 }
 
-int esp32::readBuffer() {
+int Esp32::readBuffer() {
     return 0;
 }
 
-void esp32::writeBuffer(int data) {
+void Esp32::writeBuffer(int data) {
 }

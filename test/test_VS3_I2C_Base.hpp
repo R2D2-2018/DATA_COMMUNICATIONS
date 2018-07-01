@@ -3,7 +3,7 @@
 
 #include <array>
 
-auto bus = i2c::i2c<0x03>();
+auto bus = I2c::I2c<0x03>();
 
 TEST_CASE("Read returns address", "[Read]") {
     const uint8_t addr = 0x28;

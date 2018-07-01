@@ -15,7 +15,7 @@
 namespace twi {
 
 template <uint32_t SPEED>
-class twi {
+class Twi {
   private:
     static constexpr uint32_t masterClock = 84000000; ///< Master clock rate 84MHz
 
@@ -70,7 +70,7 @@ class twi {
      *
      * Constructor for the TWI interface.
      */
-    twi() {
+    Twi() {
         auto config_pin = [](uint32_t pin) {
             PIOA->PIO_ABSR &= (~pin & PIOA->PIO_ABSR);
             PIOA->PIO_PDR  = pin;
