@@ -1,4 +1,4 @@
-#include "../src/ESP32.hpp"
+#include "../src/esp32.hpp"
 #include "catch.hpp"
 
 #include <typeinfo>

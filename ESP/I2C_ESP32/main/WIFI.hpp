@@ -10,13 +10,13 @@
  * @author    Kiet van Osnabrugge
  * @license   MIT
  */
-class WIFI {
+class wifi {
   private:
   public:
-    WIFI();
+    wifi();
 
     /**
-     * @brief resieves data via wifi
+     * @brief receives data via wifi
      *
      * @description
      *
