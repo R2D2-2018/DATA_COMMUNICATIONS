@@ -78,6 +78,6 @@ class i2c {
     }
 };
 
-} // namespace I2C
+} // namespace i2c
 
 #endif // I2C_HPP

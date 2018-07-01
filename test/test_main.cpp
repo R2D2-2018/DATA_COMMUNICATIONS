@@ -4,7 +4,6 @@
 
 // VERTICAL_SLICE_1
 #include "test_VS1-Dummy_OP_CODES.hpp"
-#include "test_VS1-esp32.hpp"
 
 // VERTICAL_SLICE_2
 #include "test_VS2-EnumForRegisters.hpp"

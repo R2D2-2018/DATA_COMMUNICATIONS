@@ -1,10 +1,11 @@
-#ifndef WIFI_HPP
-#define WIFI_HPP
+#ifndef wifi_HPP
+#define wifi_HPP
 
+// #include "I2C_ESP.hpp"
 #include <iostream>
 
 /**
- * @file      WIFI.hpp
+ * @file      wifi.hpp
  * @brief     This class can preform data communication through wifi.
  * @author    Kiet van Osnabrugge
  * @license   MIT
@@ -22,7 +23,7 @@ class wifi {
      * @return
      * buffer : uint8_t *
      */
-    uint8_t * readWifiBuffer(); // This function if currently empty
+    uint8_t *readwifiBuffer(); // This function if currently empty
 
     /**
      * @brief sends data via wifi
@@ -33,7 +34,7 @@ class wifi {
      * txBuffer : uint8_t*
      * size : size_t
      */
-    void writeWifiBuffer(uint8_t *txBuffer, size_t size); // This function is currently empty
+    void writewifiBuffer(uint8_t *txBuffer, size_t size); // This function is currently empty
 };
 
 #endif

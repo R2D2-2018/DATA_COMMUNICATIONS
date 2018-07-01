@@ -64,7 +64,7 @@ void AccessBuffers::masterPrintBuffer(void *taskID) { ///< This function is most
     I2cEsp master(masterSDA, masterSCL, masterPortNum, true);
 
     int ret;
-    uint32_t taskIDX = (uint32_t)taskID;
+    uint32_t task_idx = (uint32_t)taskID;
 
     int count = 0;
 
@@ -78,13 +78,13 @@ void AccessBuffers::masterPrintBuffer(void *taskID) { ///< This function is most
         if (ret == ESP_ERR_TIMEOUT) {
             std::cout << "I2C TIME_OUT\n";
         } else if (ret == ESP_OK) {
-            std::cout << "TASK[" << taskIDX << "] master read:\n";
+            std::cout << "TASK[" << task_idx << "] master read:\n";
             master.printBuffer(master.getRxBuffer(), master.getRwBufferLength());
         } else {
             std::cout << esp_err_to_name(ret) << ": Master read slave error, IO not connected...\n";
         }
 
-        vTaskDelay((delayTimeBetweenItemsMS * (taskIDX + 1)) / portTICK_RATE_MS);
+        vTaskDelay((delayTimeBetweenItemsMS * (task_idx + 1)) / portTICK_RATE_MS);
     }
 };
 
@@ -95,7 +95,7 @@ uint8_t * AccessBuffers::slaveRead(void *taskID){
 
     I2cEsp slave(slaveSDA, slaveSCL, slavePortNum);
 
-    uint32_t taskIDX = (uint32_t)taskID;
+    uint32_t task_idx = (uint32_t)taskID;
 
     int size = 0;
 
@@ -109,7 +109,7 @@ uint8_t * AccessBuffers::slaveRead(void *taskID){
     } else {
         return slave.getDataBuffer();
     }
-    vTaskDelay((delayTimeBetweenItemsMS * (taskIDX + 1)) / portTICK_RATE_MS);
+    vTaskDelay((delayTimeBetweenItemsMS * (task_idx + 1)) / portTICK_RATE_MS);
 }
 
 bool AccessBuffers::slaveWrite(uint8_t *buffer, int bufferLength){
@@ -119,7 +119,7 @@ bool AccessBuffers::slaveWrite(uint8_t *buffer, int bufferLength){
 
     I2cEsp slave(slaveSDA, slaveSCL, slavePortNum);
 
-    size_t dSize = 0;
+    size_t d_size = 0;
     int x         = slave.getRwBufferLength();
 
     if (bufferLength > x){
@@ -128,9 +128,9 @@ bool AccessBuffers::slaveWrite(uint8_t *buffer, int bufferLength){
     }
 
     while (1) {
-        dSize = slave.write(slave.getDataBuffer());
+        d_size = slave.write(slave.getDataBuffer());
 
-        if (dSize == 0) {
+        if (d_size == 0) {
             //slave transmition buffer is full
             return 0;
         } else {
@@ -148,7 +148,7 @@ void AccessBuffers::slavePrintBuffer(void *taskID) { ///< This function is mostl
 
     I2cEsp slave(slaveSDA, slaveSCL, slavePortNum);
 
-    uint32_t taskIDX = (uint32_t)taskID;
+    uint32_t task_idx = (uint32_t)taskID;
 
     int count = 0;
     int size  = 0;
@@ -163,10 +163,10 @@ void AccessBuffers::slavePrintBuffer(void *taskID) { ///< This function is mostl
         if (size == ESP_ERR_TIMEOUT) {
             std::cout << "I2C TIME_OUT\n";
         } else {
-            std::cout << "Task[" << taskIDX << "] slave read: [" << size << "] bytes:\n";
+            std::cout << "Task[" << task_idx << "] slave read: [" << size << "] bytes:\n";
             slave.printBuffer(slave.getDataBuffer(), size);
         }
-        vTaskDelay((delayTimeBetweenItemsMS * (taskIDX + 1)) / portTICK_RATE_MS);
+        vTaskDelay((delayTimeBetweenItemsMS * (task_idx + 1)) / portTICK_RATE_MS);
     }
 }
 

@@ -1,9 +1,9 @@
-#include "../src/I2C.hpp"
+#include "../src/i2c.hpp"
 #include "catch.hpp"
 
 #include <array>
 
-auto bus = I2C::I2C<0x03>();
+auto bus = i2c::i2c<0x03>();
 
 TEST_CASE("Read returns address", "[Read]") {
     const uint8_t addr = 0x28;

@@ -17,3 +17,4 @@ ESP/masterAndSlave/sdkconfig
 ESP/I2C_ESP32/build/*
 ESP/I2C_ESP32/sdkconfig
 ESP/I2C_ESP32/sdkconfig.old
+ESP/I2C_ESP32/main/wifi.hpp

@@ -1,6 +1,7 @@
 /**
  * @file
- * @brief     esp32 class - containing (SPI) commands.
+ * @brief     esp32
+ * class - containing (SPI) commands.
  * @author    Roxanne van der Pol
  * @license   MIT
  */

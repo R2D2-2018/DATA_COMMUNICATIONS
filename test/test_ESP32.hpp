@@ -1,5 +1,5 @@
-#include "ESP32.hpp"
 #include "catch.hpp"
+#include "esp32.hpp"
 #include <typeinfo>
 
-ESP32 esp32;
+esp32 esp32;
