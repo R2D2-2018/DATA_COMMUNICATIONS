@@ -1,7 +1,6 @@
 #ifndef WIFI_HPP
 #define WIFI_HPP
 
-// #include "I2C_ESP.hpp"
 #include <iostream>
 
 /**
